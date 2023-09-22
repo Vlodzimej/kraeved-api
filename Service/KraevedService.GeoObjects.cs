@@ -13,6 +13,7 @@ namespace KraevedAPI.Service
         public async Task insertGeoObject(GeoObject geoObject)
         {
             _unitOfWork.GeoObjectsRepository.Insert(geoObject);
+            await _unitOfWork.SaveAsync();
         }
     }
 }

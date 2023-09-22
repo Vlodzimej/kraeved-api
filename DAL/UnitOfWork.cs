@@ -6,8 +6,8 @@ namespace KraevedAPI.DAL
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private KraevedContext context = new KraevedContext();
-        private GenericRepository<GeoObject>? geoObjectsRepository;
+        private readonly KraevedContext context;
+        private GenericRepository<GeoObject> geoObjectsRepository;
 
         public GenericRepository<GeoObject> GeoObjectsRepository
         {
@@ -22,9 +22,19 @@ namespace KraevedAPI.DAL
             }
         }
 
+        public UnitOfWork(KraevedContext context)
+        {
+            this.context = context;
+        }
+
         public void Save()
         {
             context.SaveChanges();
+        }
+
+        async public Task SaveAsync()
+        {
+            await context.SaveChangesAsync();
         }
 
         private bool disposed = false;
