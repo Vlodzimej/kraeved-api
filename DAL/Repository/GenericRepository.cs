@@ -48,7 +48,7 @@ namespace KraevedAPI.DAL.Repository
             }
         }
 
-        public virtual TEntity GetByID(object id)
+        public virtual TEntity? GetByID(object id)
         {
             return dbSet.Find(id);
         }
@@ -60,8 +60,11 @@ namespace KraevedAPI.DAL.Repository
 
         public virtual void Delete(object id)
         {
-            TEntity entityToDelete = dbSet.Find(id);
-            Delete(entityToDelete);
+            TEntity? entityToDelete = dbSet.Find(id);
+            if (entityToDelete != null)
+            {
+                Delete(entityToDelete);
+            }
         }
 
         public virtual void Delete(TEntity entityToDelete)

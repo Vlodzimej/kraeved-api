@@ -7,7 +7,7 @@ namespace KraevedAPI.DAL
     public class UnitOfWork : IUnitOfWork
     {
         private readonly KraevedContext context;
-        private GenericRepository<GeoObject> geoObjectsRepository;
+        private GenericRepository<GeoObject>? geoObjectsRepository;
 
         public GenericRepository<GeoObject> GeoObjectsRepository
         {
