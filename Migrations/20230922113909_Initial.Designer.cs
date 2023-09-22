@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KraevedAPI.Migrations
 {
     [DbContext(typeof(KraevedContext))]
-    [Migration("20230922100640_Initial")]
+    [Migration("20230922113909_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -41,7 +41,7 @@ namespace KraevedAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RpgCharacters");
+                    b.ToTable("GeoObjects");
                 });
 #pragma warning restore 612, 618
         }

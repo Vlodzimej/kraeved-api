@@ -38,7 +38,7 @@ namespace KraevedAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RpgCharacters");
+                    b.ToTable("GeoObjects");
                 });
 #pragma warning restore 612, 618
         }

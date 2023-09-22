@@ -11,7 +11,7 @@ namespace KraevedAPI.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "RpgCharacters",
+                name: "GeoObjects",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -23,7 +23,7 @@ namespace KraevedAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RpgCharacters", x => x.Id);
+                    table.PrimaryKey("PK_GeoObjects", x => x.Id);
                 });
         }
 
@@ -31,7 +31,7 @@ namespace KraevedAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "RpgCharacters");
+                name: "GeoObjects");
         }
     }
 }
