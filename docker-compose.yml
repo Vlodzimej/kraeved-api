@@ -1,0 +1,8 @@
+version: '3'
+services: 
+    kraevedapi:
+        container_name: kraevedapi
+        restart: always
+        build: .
+        volumes:
+            - 'Kraeved:/src'
