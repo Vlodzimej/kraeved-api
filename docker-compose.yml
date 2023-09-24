@@ -1,8 +1,16 @@
-version: '3'
-services: 
-    kraevedapi:
-        container_name: kraevedapi
-        restart: always
-        build: .
-        volumes:
-            - 'Kraeved:/src'
+﻿version: '3.4'
+
+services:
+  kraevedapi:
+    image: ${DOCKER_REGISTRY}kraevedapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:80
+  proxy:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80

@@ -2,6 +2,7 @@ using KraevedAPI.DAL;
 using KraevedAPI.Data;
 using KraevedAPI.Service;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,11 @@ builder.Services.AddDbContext<KraevedContext>(
 );
 
 var app = builder.Build();
+// Ѕольшинство прокси серверов используют заголовки X-Forwarded-For и X-Forwarded-Proto. »менно эти заголовки и указаны сейчас в конфигурации nginx.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
