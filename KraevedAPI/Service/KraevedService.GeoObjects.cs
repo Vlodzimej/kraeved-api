@@ -12,6 +12,7 @@ namespace KraevedAPI.Service
         public async Task<GeoObject?> getGeoObjectById(int id)
         {
             var geoObject = _unitOfWork.GeoObjectsRepository.GetByID(id);
+
             return geoObject;
         }
 
@@ -20,9 +21,12 @@ namespace KraevedAPI.Service
         /// </summary>
         /// <param name="regionId">Идентификатор региона</param>
         /// <returns></returns>
-        public async Task<IEnumerable<GeoObject>> getGeoObjectsByRegionId(int regionId)
+        public async Task<IEnumerable<GeoObjectBrief>> getGeoObjectsByRegionId(int regionId)
         {
-            var geoObjects = _unitOfWork.GeoObjectsRepository.Get(x => (regionId == x.RegionId), x => x.OrderBy(item => item.Name));
+            var geoObjects = _unitOfWork.GeoObjectsRepository
+                .Get(x => (regionId == x.RegionId), x => x.OrderBy(item => item.Name))
+                .Select(geoObject => _mapper.Map<GeoObjectBrief>(geoObject));
+
             return geoObjects;
         }
 
@@ -34,6 +38,7 @@ namespace KraevedAPI.Service
         public async Task insertGeoObject(GeoObject geoObject)
         {
             _unitOfWork.GeoObjectsRepository.Insert(geoObject);
+
             await _unitOfWork.SaveAsync();
         }
     }

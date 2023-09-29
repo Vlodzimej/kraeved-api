@@ -1,14 +1,17 @@
-﻿using KraevedAPI.DAL;
+﻿using AutoMapper;
+using KraevedAPI.DAL;
 
 namespace KraevedAPI.Service
 {
     public partial class KraevedService : IKraevedService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public KraevedService(IUnitOfWork unitOfWork)
+        public KraevedService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         #region IDisposable

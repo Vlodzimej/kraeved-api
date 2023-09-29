@@ -2,8 +2,10 @@ using KraevedAPI.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using KraevedAPI.DAL;
-using KraevedAPI.Models;
 using KraevedAPI.Core;
+using AutoMapper;
+using KraevedAPI.Helpers;
+using KraevedAPI.ClassObjects;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,15 @@ builder.Services.AddDbContext<KraevedContext>(
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
+
+// Auto Mapper Configurations
+var mappingConfig = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile<AutoMapperProfile>();
+});
+
+IMapper mapper = mappingConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 var app = builder.Build();
 // Ѕольшинство прокси серверов используют заголовки X-Forwarded-For и X-Forwarded-Proto. »менно эти заголовки и указаны сейчас в конфигурации nginx.

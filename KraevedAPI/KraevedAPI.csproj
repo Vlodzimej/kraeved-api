@@ -8,17 +8,11 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
     <DockerfileRunArguments>--mount source=kraeved-vol,destination=\src</DockerfileRunArguments>
-    <DockerComposeProjectPath>Docker/docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerComposeProjectPath>docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Docker\**" />
-    <Content Remove="Docker\**" />
-    <EmbeddedResource Remove="Docker\**" />
-    <None Remove="Docker\**" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
       <PrivateAssets>all</PrivateAssets>

@@ -16,7 +16,7 @@ services:
     image: nginx:latest
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./cert.crt:/etc/nginx/cert.crt
-      - ./cert.rsa:/etc/nginx/cert.rsa
+      - ./KraevedAPI/cert.crt:/etc/nginx/cert.crt
+      - ./KraevedAPI/cert.rsa:/etc/nginx/cert.rsa
     ports:
       - "5001:44392"

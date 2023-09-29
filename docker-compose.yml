@@ -5,4 +5,4 @@ services:
     image: ${DOCKER_REGISTRY-}kraevedapi
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: KraevedAPI/Dockerfile

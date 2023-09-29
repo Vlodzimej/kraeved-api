@@ -34,6 +34,6 @@ namespace KraevedAPI.Models
         /// <summary>
         /// Идентификатор региона
         /// </summary>
-        public int RegionId  { get; set; }
+        public int RegionId { get; set; }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 
-namespace KraevedAPI.Models
+namespace KraevedAPI.ClassObjects
 {
     public class HttpResponseException : Exception
-    { 
+    {
         public HttpResponseException(int statusCode, object? value = null) => (StatusCode, Value) = (statusCode, value);
 
         public int StatusCode { get; }
