@@ -7,14 +7,14 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["KraevedAPI.csproj", "."]
+COPY ["KraevedAPI/KraevedAPI.csproj", "."]
 RUN dotnet restore "./KraevedAPI.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "KraevedAPI.csproj" -c Release -o /app/build
+RUN dotnet build "KraevedAPI/KraevedAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "KraevedAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "KraevedAPI/KraevedAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

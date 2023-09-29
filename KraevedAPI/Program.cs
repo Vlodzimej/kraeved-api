@@ -1,8 +1,7 @@
-using KraevedAPI.DAL;
-using KraevedAPI.Data;
 using KraevedAPI.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
+using KraevedAPI.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 

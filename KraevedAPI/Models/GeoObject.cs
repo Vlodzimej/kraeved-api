@@ -31,5 +31,9 @@ namespace KraevedAPI.Models
         /// Долгота
         /// </summary>
         public double Longitude { get; set; }
+        /// <summary>
+        /// Идентификатор региона
+        /// </summary>
+        public int RegionId  { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using KraevedAPI.Data;
-using KraevedAPI.Models;
+﻿using KraevedAPI.Models;
 
 namespace KraevedAPI.DAL.Repository
 {

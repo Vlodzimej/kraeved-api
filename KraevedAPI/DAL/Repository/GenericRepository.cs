@@ -5,7 +5,6 @@ using System.Data;
 using KraevedAPI.Models;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using KraevedAPI.Data;
 
 namespace KraevedAPI.DAL.Repository
 {

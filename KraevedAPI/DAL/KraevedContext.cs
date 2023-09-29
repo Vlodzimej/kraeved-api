@@ -1,9 +1,9 @@
 ﻿using KraevedAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace KraevedAPI.Data
+namespace KraevedAPI.DAL
 {
-    public class KraevedContext: DbContext
+    public class KraevedContext : DbContext
     {
         public KraevedContext()
         {
