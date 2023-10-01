@@ -1,4 +1,5 @@
-﻿using KraevedAPI.Core;
+﻿using KraevedAPI.ClassObjects;
+using KraevedAPI.Core;
 using KraevedAPI.Models;
 using KraevedAPI.Service;
 using Microsoft.AspNetCore.Http;
@@ -25,26 +26,34 @@ namespace KraevedAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GeoObject>> GetGeoObjectById(int id)
         {
-            var geoObject = await _kraevedService.getGeoObjectById(id);
+            var result = await _kraevedService.getGeoObjectById(id);
 
-            if(geoObject == null) {
+            if(result == null) {
                 return BadRequest();
             }
 
-            return Ok(geoObject);
+            return Ok(result);
         }
 
         /// <summary>
-        /// Получить список гео-объектов по идентификатору региона
+        /// Получить список гео-объектов по фильру
         /// </summary>
+        /// <param name="name"></param>
         /// <param name="regionId"></param>
         /// <returns></returns>
-        [HttpGet("region/{regionId}")]
-        public async Task<ActionResult<IEnumerable<GeoObject>>> GetGeoObjects(int regionId) 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<GeoObjectBrief>>> GetGeoObjects([FromQuery] string? name, [FromQuery] int? regionId) 
         {
-            var geoObjects = await _kraevedService.getGeoObjectsByRegionId(regionId);
+            var filter = new GeoObjectFilter() { Name = name, RegionId = regionId };
+            var result = await _kraevedService.getGeoObjectsByFilter(filter);
+            string? errorMessage = null;
 
-            return Ok(geoObjects);
+            if (result == null) 
+            {
+                errorMessage = "Ошибка поиска";
+            }
+
+            return errorMessage != null ? BadRequest(new { errorMessage }) : Ok(result);
         }
 
         /// <summary>
@@ -55,9 +64,44 @@ namespace KraevedAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> InsertGeoObject(GeoObject geoObject)
         {
-            await _kraevedService.insertGeoObject(geoObject);
+            var result = await _kraevedService.insertGeoObject(geoObject);
 
-            return Ok();
+            if (result == null)
+            {
+                return BadRequest(new { message = "Объект не создан" });
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Удалить гео-объект по идентификатору
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteGeoObject(int id)
+        {
+            var result = await _kraevedService.deleteGeoObject(id);
+
+            if(result == null) {
+                return BadRequest(new { message = "Объект не найден" });
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> UpdateGeoObject([FromBody]GeoObject geoObject)
+        {
+            var result = await _kraevedService.updateGeoObject(geoObject);
+
+            if (result == null)
+            {
+                return BadRequest(new { message = "Объект не найден" });
+            }
+
+            return Ok(result);
         }
     }
 }

@@ -26,14 +26,14 @@ namespace KraevedAPI.Models
         /// Широта
         /// </summary>
         /// 
-        public double Latitude { get; set; }
+        public double? Latitude { get; set; }
         /// <summary>
         /// Долгота
         /// </summary>
-        public double Longitude { get; set; }
+        public double? Longitude { get; set; }
         /// <summary>
         /// Идентификатор региона
         /// </summary>
-        public int RegionId { get; set; }
+        public int? RegionId { get; set; }
     }
 }
