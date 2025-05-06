@@ -42,7 +42,21 @@ namespace KraevedAPI.Controllers
             }
 
             return Ok(result);
+        }
+
+        [HttpPost("registration")]
+        public async Task<ActionResult> Register([FromBody] LoginInDto loginDto) {
+            UserOutDto? result;
             
+            try {
+                result = await _kraevedService.Register(loginDto.Email, loginDto.Password);
+            }
+
+            catch(Exception ex) {
+                return BadRequest(new { ex.Message });
+            }
+
+            return Ok(result);
         }
     }
 }

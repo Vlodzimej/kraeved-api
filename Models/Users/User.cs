@@ -22,6 +22,12 @@ namespace KraevedAPI.Models
         public required string Phone { get; set; }
 
         /// <summary>
+        /// Email пользователя
+        /// </summary>
+        /// <value></value>
+        public required string Email { get; set; }
+
+        /// <summary>
         /// Имя
         /// </summary>
         public required string Name { get; set; }

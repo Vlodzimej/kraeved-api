@@ -37,6 +37,11 @@
             public const string PasswordErrorSpaces = "The password cannot be empty or contain spaces";
             public const string EmptyStringValue = "Value cannot be empty or whitespace only string";
             public const string SmsServiceError = "Sms service error";
+            public const string EmailIsEmpty = "Email is empty";
+            public const string EmailExits = "Email exists";
+            public const string EmailNotFound = "Email not found";
+            public const string InvalidEmail = "Invalid email";
+            public const string UserCreationError = "User creation error";
         }
 
         public static class Roles

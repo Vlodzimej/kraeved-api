@@ -9,6 +9,36 @@ namespace KraevedAPI.Service
 {
     public partial class KraevedService : IKraevedService
     {
+
+        public async Task<UserOutDto> Register(string? email, string? password) {
+            var userEmail = email?.Trim();
+
+            if (email?.Trim() == null) {
+                throw new Exception(ServiceConstants.Exception.EmailIsEmpty);
+            }
+
+            if (password == null) {
+                throw new Exception(ServiceConstants.Exception.InvalidPassword);
+            }
+
+            if (_unitOfWork.UsersRepository.Get(x => x.Email == userEmail).FirstOrDefault() != null) {
+               throw new Exception(ServiceConstants.Exception.EmailExits); 
+            }
+
+            await CreateUser(null, userEmail, password);
+
+            var user = _unitOfWork.UsersRepository.Get(x => x.Email == userEmail).FirstOrDefault();
+
+            if (user == null) {
+                throw new Exception(ServiceConstants.Exception.UserCreationError);
+            }
+
+            await UpdateUserPassword(user.Id, password);
+
+            var userInfo = _mapper.Map<User, UserOutDto>(user);
+            return userInfo;
+        }
+
         /// <summary>
         /// Генерация кода подтверждения по номеру телефона 
         /// </summary>
@@ -85,8 +115,13 @@ namespace KraevedAPI.Service
         public async Task<LoginOutDto> Login(LoginInDto loginDto)
         {
             var phone = loginDto.Phone;
+            var email = loginDto.Email;
             var code = loginDto.Code;
             var password = loginDto.Password;
+
+            if (email != null && password != null && VerifyEmail(email)) {
+                return await LoginByEmail(email, password);
+            }
 
             if (!VerifyPhone(phone))
             {
@@ -99,7 +134,7 @@ namespace KraevedAPI.Service
             }
             else if (password != null)
             {
-                return await LoginByPassword(phone, password);
+                return await LoginByPhone(phone, password);
             }
 
             throw new Exception(ServiceConstants.Exception.AuthorisationError);
@@ -125,16 +160,16 @@ namespace KraevedAPI.Service
                     throw new Exception(ServiceConstants.Exception.InvalidSmsCode);
                 }
 
-                removeSmsCodesByPhone(phone);
+                RemoveSmsCodesByPhone(phone);
             }
 
             var password = Guid.NewGuid().ToString() ?? throw new Exception(ServiceConstants.Exception.UnknownError);
 
             var user = _unitOfWork.UsersRepository
                 .Get(x => x.Phone == phone)
-                .FirstOrDefault() ?? await CreateUser(phone, password);
+                .FirstOrDefault() ?? await CreateUser(phone, null, password);
 
-            _ = UpdateUserPassword(user.Id, password);
+            await UpdateUserPassword(user.Id, password);
 
             var loginOutDto = new LoginOutDto()
             {
@@ -144,7 +179,7 @@ namespace KraevedAPI.Service
             return loginOutDto;
         }
 
-        private async Task<LoginOutDto> LoginByPassword(string phone, string password)
+        private async Task<LoginOutDto> LoginByPhone(string phone, string password)
         {
             if (!VerifyPhone(phone))
             {
@@ -171,14 +206,15 @@ namespace KraevedAPI.Service
         /// </summary>
         /// <param name="phone"></param>
         /// <returns></returns>
-        private async Task<User> CreateUser(String phone, String password)
+        private async Task<User> CreateUser(String? phone, String? email, String password)
         {
             var (passwordHash, passwordSalt) = GeneratePasswordHash(password);
             var userRole = _unitOfWork.RolesRepository.GetRoleByName(ServiceConstants.Roles.User.Name);
 
             var user = new User()
             {
-                Phone = phone,
+                Phone = phone ?? "",
+                Email = email ?? "",
                 Name = "",
                 Surname = "",
                 PasswordHash = passwordHash,
@@ -196,7 +232,7 @@ namespace KraevedAPI.Service
         /// Удаление всех кодов подтверждения пользователя, которые были созданы более 5 минут назад
         /// </summary>
         /// <returns></returns>
-        private async void removeSmsCodesByPhone(string phone)
+        private async void RemoveSmsCodesByPhone(string phone)
         {
             var smsCodes = _unitOfWork.SmsCodesRepository.Get(x => x.Phone == phone);
             foreach (var smsCode in smsCodes)
@@ -306,6 +342,27 @@ namespace KraevedAPI.Service
             return user;
         }
 
+        private async Task<LoginOutDto> LoginByEmail(string email, string password) {
+            if (!VerifyEmail(email))
+            {
+                throw new Exception(ServiceConstants.Exception.InvalidEmail);
+            }
+
+            var user = _unitOfWork.UsersRepository.Get(x => x.Email == email).FirstOrDefault() ?? throw new Exception(ServiceConstants.Exception.UserNotFound);
+
+            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            {
+                throw new Exception(ServiceConstants.Exception.InvalidPassword);
+            }
+
+            var loginOutDto = new LoginOutDto()
+            {
+                Token = GetToken(user.Id, user.RoleId)
+            };
+
+            return await Task.FromResult(loginOutDto);
+        }
+
         private Boolean VerifyPhone(string? phone)
         {
             if (phone == null)
@@ -313,6 +370,12 @@ namespace KraevedAPI.Service
                 return false;
             }
             return phone.Trim().Length == ServiceConstants.Authentication.PhoneLength;
+        }
+
+        private Boolean VerifyEmail(string email) 
+        {
+            //TODO: Реализовать полную валидацию
+            return !email.Trim().IsNullOrEmpty();
         }
 
         private Boolean VerifyCode(string? code)

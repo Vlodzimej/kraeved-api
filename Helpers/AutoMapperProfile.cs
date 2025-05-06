@@ -1,6 +1,6 @@
-﻿using System.Web.WebPages;
-using AutoMapper;
+﻿using AutoMapper;
 using KraevedAPI.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace KraevedAPI.Helpers
 {
@@ -18,7 +18,7 @@ namespace KraevedAPI.Helpers
             .ForMember( 
                 dest => dest.ShortDescription,
                 src => src.MapFrom(
-                    item => !item.ShortDescription.IsEmpty() ? 
+                    item => !item.ShortDescription.IsNullOrEmpty() ? 
                         item.ShortDescription : 
                         item.Description.Substring(0, Math.Min(item.Description.Count(), 128))
                 )

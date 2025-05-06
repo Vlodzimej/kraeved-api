@@ -6,7 +6,8 @@ namespace KraevedAPI.Models
     /// </summary>
     public class LoginInDto 
     {
-        public required string Phone { get; set; }
+        public string? Phone { get; set; }
+        public string? Email { get; set; }
         public string? Code { get; set; }
         public string? Password { get; set; }
     }
