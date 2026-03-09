@@ -14,14 +14,14 @@ namespace KraevedAPI.Migrations
             migrationBuilder.AddColumn<byte[]>(
                 name: "PasswordHash",
                 table: "Users",
-                type: "BLOB",
+                type: "bytea",
                 nullable: false,
                 defaultValue: new byte[0]);
 
             migrationBuilder.AddColumn<byte[]>(
                 name: "PasswordSalt",
                 table: "Users",
-                type: "BLOB",
+                type: "bytea",
                 nullable: false,
                 defaultValue: new byte[0]);
 

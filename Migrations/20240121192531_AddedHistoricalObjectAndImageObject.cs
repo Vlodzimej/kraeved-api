@@ -34,7 +34,7 @@ namespace KraevedAPI.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     iconId = table.Column<int>(type: "INTEGER", nullable: true),
-                    Content = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    Content = table.Column<byte[]>(type: "bytea", nullable: false),
                     HistoricalEventId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>

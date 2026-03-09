@@ -49,7 +49,7 @@ namespace KraevedAPI.Migrations
             migrationBuilder.AddColumn<byte[]>(
                 name: "Data",
                 table: "ImageObjects",
-                type: "BLOB",
+                type: "bytea",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
@@ -127,7 +127,7 @@ namespace KraevedAPI.Migrations
             migrationBuilder.AddColumn<byte[]>(
                 name: "Content",
                 table: "ImageObjects",
-                type: "BLOB",
+                type: "bytea",
                 nullable: false,
                 defaultValue: new byte[0]);
 

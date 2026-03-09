@@ -82,7 +82,7 @@ namespace KraevedAPI.Migrations
 
                     b.Property<byte[]>("Content")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("bytea");
 
                     b.Property<int?>("HistoricalEventId")
                         .HasColumnType("INTEGER");

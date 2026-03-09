@@ -97,7 +97,7 @@ namespace KraevedAPI.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<byte[]>("Data")
-                        .HasColumnType("BLOB");
+                        .HasColumnType("bytea");
 
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");

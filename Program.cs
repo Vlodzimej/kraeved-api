@@ -27,7 +27,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<DbContext, KraevedContext>();
 
 builder.Services.AddDbContext<KraevedContext>(
-    options => options.UseSqlite(
+    options => options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
