@@ -209,7 +209,7 @@ namespace KraevedAPI.Service
         private async Task<User> CreateUser(String? phone, String? email, String password)
         {
             var (passwordHash, passwordSalt) = GeneratePasswordHash(password);
-            var userRole = _unitOfWork.RolesRepository.GetRoleByName(ServiceConstants.Roles.User.Name);
+            var userRole = _unitOfWork.RolesRepository.GetRoleByName(Roles.User.Name);
 
             var user = new User()
             {
@@ -219,7 +219,7 @@ namespace KraevedAPI.Service
                 Surname = "",
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                StartDate = DateTime.Now,
+                StartDate = DateTime.UtcNow,
                 RoleId = userRole.Id
             };
 

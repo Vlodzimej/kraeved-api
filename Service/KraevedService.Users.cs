@@ -31,7 +31,7 @@ namespace KraevedAPI.Service
 
             var currentUser = GetCurrentUser();
             if (currentUser.Phone == "9105968117") {
-                var adminRole = _unitOfWork.RolesRepository.GetRoleByName(ServiceConstants.Roles.Admin.Name);
+                var adminRole = _unitOfWork.RolesRepository.GetRoleByName(Roles.Admin.Name);
                 user.Role = adminRole;
             }
 
