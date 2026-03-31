@@ -1,3 +1,4 @@
+using KraevedAPI.ClassObjects;
 using KraevedAPI.Models;
 using KraevedAPI.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,9 @@ namespace KraevedAPI.Controllers
             try {
                 result = await _kraevedService.Login(loginDto);
             }
-
+            catch (HttpResponseException) {
+                throw;
+            }
             catch(Exception ex) {
                 return BadRequest(new { ex.Message });
             }
@@ -36,7 +39,9 @@ namespace KraevedAPI.Controllers
             try {
                 result = await _kraevedService.SendSms(phone);
             }
-
+            catch (HttpResponseException) {
+                throw;
+            }
             catch(Exception ex) {
                 return BadRequest(new { ex.Message });
             }
@@ -51,7 +56,9 @@ namespace KraevedAPI.Controllers
             try {
                 result = await _kraevedService.Register(loginDto.Email, loginDto.Password);
             }
-
+            catch (HttpResponseException) {
+                throw;
+            }
             catch(Exception ex) {
                 return BadRequest(new { ex.Message });
             }

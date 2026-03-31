@@ -1,3 +1,4 @@
+using KraevedAPI.ClassObjects;
 using KraevedAPI.Constants;
 using KraevedAPI.Models;
 
@@ -43,10 +44,10 @@ namespace KraevedAPI.Service
 
         private User GetCurrentUser() {
             var userId = _httpContextAccessor.HttpContext.User.Identity.Name
-                ?? throw new Exception(ServiceConstants.Exception.UserNotFound);
+                ?? throw new HttpResponseException(401, new { message = ServiceConstants.Exception.UserNotFound });
                 
             var user = _unitOfWork.UsersRepository.Get(x => x.Id == int.Parse(userId), includeProperties: "Role").FirstOrDefault() 
-                ?? throw new Exception(ServiceConstants.Exception.UserNotFound);
+                ?? throw new HttpResponseException(401, new { message = ServiceConstants.Exception.UserNotFound });
 
             return user;
         }

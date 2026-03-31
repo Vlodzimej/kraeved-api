@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using KraevedAPI.ClassObjects;
 using KraevedAPI.Constants;
 using KraevedAPI.Models;
 using Microsoft.IdentityModel.Tokens;
@@ -186,7 +187,7 @@ namespace KraevedAPI.Service
                 throw new Exception(ServiceConstants.Exception.InvalidPhoneNumber);
             }
 
-            var user = _unitOfWork.UsersRepository.Get(x => x.Phone == phone).FirstOrDefault() ?? throw new Exception(ServiceConstants.Exception.UserNotFound);
+            var user = _unitOfWork.UsersRepository.Get(x => x.Phone == phone).FirstOrDefault() ?? throw new HttpResponseException(401, new { message = ServiceConstants.Exception.UserNotFound });
 
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
@@ -330,7 +331,7 @@ namespace KraevedAPI.Service
 
         private async Task<User> UpdateUserPassword(int id, string password)
         {
-            var user = _unitOfWork.UsersRepository.GetByID(id) ?? throw new Exception(ServiceConstants.Exception.UserNotFound);
+            var user = _unitOfWork.UsersRepository.GetByID(id) ?? throw new HttpResponseException(401, new { message = ServiceConstants.Exception.UserNotFound });
             var (passwordHash, passwordSalt) = GeneratePasswordHash(password);
 
             user.PasswordHash = passwordHash;
@@ -348,7 +349,7 @@ namespace KraevedAPI.Service
                 throw new Exception(ServiceConstants.Exception.InvalidEmail);
             }
 
-            var user = _unitOfWork.UsersRepository.Get(x => x.Email == email).FirstOrDefault() ?? throw new Exception(ServiceConstants.Exception.UserNotFound);
+            var user = _unitOfWork.UsersRepository.Get(x => x.Email == email).FirstOrDefault() ?? throw new HttpResponseException(401, new { message = ServiceConstants.Exception.UserNotFound });
 
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
