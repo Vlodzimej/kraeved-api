@@ -1,6 +1,6 @@
 namespace KraevedAPI.Models
 {
-    public class GeoObjectType
+    public class GeoObjectCategory
     {
         /// <summary>
         /// Идентификатор типа гео-объекта
@@ -14,8 +14,5 @@ namespace KraevedAPI.Models
         /// Название
         /// </summary>
         public required string Title { get; set; }
-
-        public GeoObjectCategory? Category { get; set; }
-        public int? CategoryId { get; set; }
     }
 }

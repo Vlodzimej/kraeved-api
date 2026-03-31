@@ -10,14 +10,21 @@ namespace KraevedAPI.Service
         /// </summary>
         /// <param name="id">Идентификатор гео-объекта</param>
         /// <returns></returns>
-        public Task<GeoObject?> GetGeoObjectById(int id)
+        public async Task<GeoObject?> GetGeoObjectById(int id)
         {
             var filter = new GeoObjectFilter() { Id = id };
             var result = _unitOfWork.GeoObjectsRepository
                 .Get(x => filter.Id == null || x.Id == filter.Id, includeProperties: "Type")
                 ?? throw new Exception(ServiceConstants.Exception.UnknownError);
 
-            return Task.FromResult(result.FirstOrDefault());
+            var geoObject = result.FirstOrDefault();
+
+            if (geoObject != null && geoObject.Images == null)
+            {
+                geoObject.Images = new List<string>();
+            }
+
+            return geoObject;
         }
 
         /// <summary>
@@ -29,11 +36,11 @@ namespace KraevedAPI.Service
         {
             //TODO: Поправить поиск по имени с приведением в нижний регистр
             var result = _unitOfWork.GeoObjectsRepository
-                .Get(x => 
-                    (filter.Name == null || x.Name.ToLower().Contains(filter.Name.ToLower())) && 
-                    (filter.RegionId == null || (filter.RegionId == x.RegionId)),                         
+                .Get(x =>
+                    (filter.Name == null || x.Name.ToLower().Contains(filter.Name.ToLower())) &&
+                    (filter.RegionId == null || (filter.RegionId == x.RegionId)),
                     x => x.OrderBy(item => item.Name), includeProperties: "Type")
-                .Select(_mapper.Map<GeoObjectBrief>) ?? 
+                .Select(_mapper.Map<GeoObjectBrief>) ??
                     throw new Exception(ServiceConstants.Exception.UnknownError);
 
             return Task.FromResult(result);
@@ -46,39 +53,43 @@ namespace KraevedAPI.Service
         /// <returns></returns>
         public async Task<GeoObject> InsertGeoObject(GeoObject geoObject)
         {
-            if (geoObject.TypeId == null) {
+            if (geoObject.TypeId == null)
+            {
                 throw new Exception(ServiceConstants.Exception.GeoObjectTypeIsNull);
-            } 
+            }
 
             Validate(geoObject);
-            
+
             var filter = new GeoObjectFilter() { Name = geoObject.Name, RegionId = geoObject.RegionId };
             var existedGeoObjectList = await GetGeoObjectsByFilter(filter);
-            if (existedGeoObjectList.FirstOrDefault() != null) {
+            if (existedGeoObjectList.FirstOrDefault() != null)
+            {
                 throw new Exception(ServiceConstants.Exception.ObjectExists);
             }
 
             var type = _unitOfWork.GeoObjectTypesRepository.GetByID(geoObject.TypeId);
 
-            if (type == null) {
+            if (type == null)
+            {
                 throw new Exception(ServiceConstants.Exception.GeoObjectTypeNotFound);
             }
 
-            var newGeoObject = new GeoObject() {
+            var newGeoObject = new GeoObject()
+            {
                 Name = geoObject.Name,
                 Type = type,
                 Description = geoObject.Description,
                 ShortDescription = geoObject.ShortDescription,
             };
-     
+
             _unitOfWork.GeoObjectsRepository.Insert(geoObject);
             await _unitOfWork.SaveAsync();
 
             var insertedGeoObject = _unitOfWork.GeoObjectsRepository
-                .Get(x => 
-                    (x.Name == geoObject.Name) && 
-                    (x.Latitude == geoObject.Latitude) && 
-                    (x.Longitude == geoObject.Longitude) && 
+                .Get(x =>
+                    (x.Name == geoObject.Name) &&
+                    (x.Latitude == geoObject.Latitude) &&
+                    (x.Longitude == geoObject.Longitude) &&
                     (x.Description == geoObject.Description))
                 .FirstOrDefault() ?? throw new Exception(ServiceConstants.Exception.CreatedObjectNotFound);
 
@@ -108,7 +119,7 @@ namespace KraevedAPI.Service
         /// <returns></returns>
         public async Task<GeoObject> UpdateGeoObject(GeoObject geoObject)
         {
-            var existingGeoObject = _unitOfWork.GeoObjectsRepository.Get(x => geoObject.Id == x.Id).FirstOrDefault() ?? 
+            var existingGeoObject = _unitOfWork.GeoObjectsRepository.Get(x => geoObject.Id == x.Id).FirstOrDefault() ??
                 throw new Exception(ServiceConstants.Exception.NotFound);
             Validate(existingGeoObject);
 
@@ -118,7 +129,7 @@ namespace KraevedAPI.Service
             existingGeoObject.ShortDescription = geoObject.ShortDescription;
             existingGeoObject.Description = geoObject.Description;
             existingGeoObject.Longitude = geoObject.Longitude;
-            existingGeoObject.Latitude = geoObject.Latitude;                
+            existingGeoObject.Latitude = geoObject.Latitude;
             existingGeoObject.RegionId = geoObject.RegionId;
             existingGeoObject.Type = type;
             existingGeoObject.Thumbnail = geoObject.Thumbnail;
@@ -134,8 +145,10 @@ namespace KraevedAPI.Service
         /// Валидация объекта исторического события
         /// </summary>
         /// <param name="historicalEvent"></param>
-        private void Validate(GeoObject? geoObject) {
-            if (geoObject == null) {
+        private void Validate(GeoObject? geoObject)
+        {
+            if (geoObject == null)
+            {
                 throw new Exception(ServiceConstants.Exception.ObjectEqualsNull);
             }
 
@@ -143,17 +156,20 @@ namespace KraevedAPI.Service
 
             var nameLenght = geoObject.Name.Trim().Length;
 
-            if (nameLenght == 0) {
+            if (nameLenght == 0)
+            {
                 errorMessages.Append("Не заполнено название");
             }
 
-            if (nameLenght > 100) {
+            if (nameLenght > 100)
+            {
                 errorMessages.Append("Название не должно превышать 100 символов");
             }
 
             //TODO: Сделать полную валидацию
 
-            if (errorMessages.Length > 0) {
+            if (errorMessages.Length > 0)
+            {
                 throw new Exception(string.Join("\n", errorMessages));
             }
         }

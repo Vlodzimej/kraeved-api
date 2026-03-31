@@ -53,7 +53,7 @@ namespace KraevedAPI.Models
         public DateTime StartDate { get; set; }
 
         /// <summary>
-        /// Идентификтор роли
+        /// Идентификатор роли
         /// </summary>
         public int RoleId { get; set; }
 

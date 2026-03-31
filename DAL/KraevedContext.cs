@@ -15,5 +15,7 @@ namespace KraevedAPI.DAL
         public DbSet<User> Users => Set<User>();
         public DbSet<SmsCode> SmsCodes => Set<SmsCode>();
         public DbSet<Role> Roles => Set<Role>();
+        public DbSet<GeoObjectCategory> GeoObjectCategories => Set<GeoObjectCategory>();
+        public DbSet<GeoObjectType> GeoObjectTypes => Set<GeoObjectType>();
     }
 }

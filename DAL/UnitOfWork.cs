@@ -34,6 +34,19 @@ namespace KraevedAPI.DAL
                 return historicalEventsRepository;
             }
         }
+        private GenericRepository<GeoObjectCategory>? geoObjectCategoriesRepository;
+
+        public GenericRepository<GeoObjectCategory> GeoObjectCategoriesRepository
+        {
+            get
+            {
+                if (this.geoObjectCategoriesRepository == null)
+                {
+                    this.geoObjectCategoriesRepository = new GenericRepository<GeoObjectCategory>(context);
+                }
+                return geoObjectCategoriesRepository;
+            }
+        }
 
         private GenericRepository<GeoObjectType>? geoObjectTypesRepository;
 

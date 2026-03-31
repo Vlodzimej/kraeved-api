@@ -115,7 +115,7 @@ namespace KraevedAPI.Service
         public async Task<LoginOutDto> Login(LoginInDto loginDto)
         {
             var phone = loginDto.Phone;
-            var email = loginDto.Email;
+            var email = (loginDto.Email ?? "").ToLower();
             var code = loginDto.Code;
             var password = loginDto.Password;
 
