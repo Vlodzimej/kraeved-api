@@ -14,14 +14,17 @@ namespace KraevedAPI.Service
 
             var currentUser = GetCurrentUser();
 
-            var geoObjectType = _unitOfWork.GeoObjectTypesRepository.GetByID(id) ?? 
+            var geoObjectType = _unitOfWork.GeoObjectTypesRepository
+                .Get(x => x.Id == id, includeProperties: "Category")
+                .FirstOrDefault() ?? 
                 throw new Exception(ServiceConstants.Exception.NotFound);
             
             return Task.FromResult(geoObjectType);
         }
 
         public Task<IEnumerable<GeoObjectType>> GetAllGeoObjectTypes() {
-            var geoObjectTypes = _unitOfWork.GeoObjectTypesRepository.Get() ??
+            var geoObjectTypes = _unitOfWork.GeoObjectTypesRepository
+                .Get(includeProperties: "Category") ??
                 throw new Exception(ServiceConstants.Exception.UnknownError);
 
             return Task.FromResult(geoObjectTypes);
@@ -77,7 +80,8 @@ namespace KraevedAPI.Service
                 Validate(geoObjectType);
 
                 existingGeoObjectType.Name = geoObjectType.Name;
-                existingGeoObjectType.Name = geoObjectType.Name;
+                existingGeoObjectType.Title = geoObjectType.Title;
+                existingGeoObjectType.CategoryId = geoObjectType.CategoryId;
                 _unitOfWork.GeoObjectTypesRepository.Update(existingGeoObjectType);
                 await _unitOfWork.SaveAsync();
             }
