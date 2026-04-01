@@ -1,4 +1,4 @@
-﻿namespace KraevedAPI.Models
+namespace KraevedAPI.Models
 {
     /// <summary>
     /// Географический объект сокращенный
@@ -21,12 +21,19 @@
         public string ShortDescription { get; set; } = string.Empty;
 
         /// <summary>
-        /// Тип локации
-        /// </summary> <summary>
-        /// 
+        /// Системное имя типа
         /// </summary>
-        /// <value></value>
-        public string? Type { get; set; }
+        public string? TypeName { get; set; }
+
+        /// <summary>
+        /// Отображаемое название типа
+        /// </summary>
+        public string? TypeTitle { get; set; }
+
+        /// <summary>
+        /// Имя категории типа
+        /// </summary>
+        public string? TypeCategoryName { get; set; }
 
         /// <summary>
         /// Широта
