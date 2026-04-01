@@ -26,10 +26,12 @@ namespace KraevedAPI.Controllers
         public async Task<ActionResult<GeoObject?>> GetGeoObjectById(int id)
         {
             GeoObject? result = null;
-            try {
+            try
+            {
                 result = await _kraevedService.GetGeoObjectById(id);
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 return BadRequest(new { ex.Message });
             }
 
@@ -44,16 +46,18 @@ namespace KraevedAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<GeoObjectBrief>>> GetGeoObjects([FromQuery] string? name, [FromQuery] int? regionId) 
+        public async Task<ActionResult<IEnumerable<GeoObjectBrief>>> GetGeoObjects([FromQuery] string? name, [FromQuery] int? regionId)
         {
             IEnumerable<GeoObjectBrief>? result;
             var filter = new GeoObjectFilter() { Name = name, RegionId = regionId };
 
-            try {
+            try
+            {
                 result = await _kraevedService.GetGeoObjectsByFilter(filter);
             }
 
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 return BadRequest(new { ex.Message });
             }
 
@@ -71,11 +75,13 @@ namespace KraevedAPI.Controllers
         {
             GeoObject? result;
 
-            try {
+            try
+            {
                 result = await _kraevedService.InsertGeoObject(geoObject);
             }
 
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 return BadRequest(new { ex.Message });
             }
 
@@ -93,11 +99,13 @@ namespace KraevedAPI.Controllers
         {
             GeoObject? result = null;
 
-            try {
+            try
+            {
                 result = await _kraevedService.DeleteGeoObject(id);
             }
 
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 return BadRequest(new { ex.Message });
             }
 
@@ -110,15 +118,17 @@ namespace KraevedAPI.Controllers
         /// <param name="geoObject"></param>
         /// <returns></returns>
         [HttpPut]
-      [Authorize(Roles = "ADMIN")]
-        public async Task<ActionResult> UpdateGeoObject([FromBody]GeoObject geoObject)
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult> UpdateGeoObject([FromBody] GeoObject geoObject)
         {
             GeoObject? result = null;
 
-            try {
+            try
+            {
                 result = await _kraevedService.UpdateGeoObject(geoObject);
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 return BadRequest(new { ex.Message });
             }
 
