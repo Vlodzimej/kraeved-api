@@ -24,6 +24,7 @@ namespace KraevedAPI.Models
         public string? Patronymic { get; set; }
         public DateOnly? BirthDate { get; set; }
         public DateOnly? DeathDate { get; set; }
+        public List<string>? Photos { get; set; }
     }
 
     public class GeoObjectTypeBriefDto

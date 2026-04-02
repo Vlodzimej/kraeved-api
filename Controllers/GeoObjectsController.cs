@@ -153,6 +153,7 @@ namespace KraevedAPI.Controllers
                     Patronymic = p!.Patronymic,
                     BirthDate = p!.BirthDate,
                     DeathDate = p!.DeathDate,
+                    Photos = p!.Photos,
                 });
                 return Ok(dtos);
             }
