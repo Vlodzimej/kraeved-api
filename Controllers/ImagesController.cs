@@ -49,34 +49,44 @@ namespace KraevedAPI.Controllers
         [HttpGet("thumbnail/{filename}")]
         public async Task<ActionResult<String>?> DownloadThumbnail(string filename) {
             var rootFolder = Directory.GetCurrentDirectory();
-            var path = Path.Combine(rootFolder, "thumbnails");
+            var thumbPath = Path.Combine(rootFolder, "thumbnails", filename);
 
-            var filepath = Path.Combine(path, filename);
-            if (!System.IO.File.Exists(filepath)) {
+            if (System.IO.File.Exists(thumbPath)) {
+                new FileExtensionContentTypeProvider().TryGetContentType(Path.GetFileName(thumbPath), out var contentType);
+                var fileContents = await System.IO.File.ReadAllBytesAsync(thumbPath);
+                return File(fileContents, contentType ?? "application/octet-stream", Path.GetFileName(thumbPath));
+            }
+
+            var originalPath = Path.Combine(rootFolder, "images", filename);
+            if (!System.IO.File.Exists(originalPath)) {
                 return NotFound();
             }
 
-            new FileExtensionContentTypeProvider().TryGetContentType(Path.GetFileName(filepath), out var contentType);
-            var fileContents = await System.IO.File.ReadAllBytesAsync(filepath);
-
-            return File(fileContents, contentType ?? "application/octet-stream", Path.GetFileName(filepath));
+            new FileExtensionContentTypeProvider().TryGetContentType(Path.GetFileName(originalPath), out var contentType2);
+            var originalContents = await System.IO.File.ReadAllBytesAsync(originalPath);
+            return File(originalContents, contentType2 ?? "application/octet-stream", Path.GetFileName(originalPath));
         }
 
         [AllowAnonymous]
         [HttpGet("preview/{filename}")]
         public async Task<ActionResult<String>?> DownloadPreview(string filename) {
             var rootFolder = Directory.GetCurrentDirectory();
-            var path = Path.Combine(rootFolder, "previews");
+            var previewPath = Path.Combine(rootFolder, "previews", filename);
 
-            var filepath = Path.Combine(path, filename);
-            if (!System.IO.File.Exists(filepath)) {
+            if (System.IO.File.Exists(previewPath)) {
+                new FileExtensionContentTypeProvider().TryGetContentType(Path.GetFileName(previewPath), out var contentType);
+                var fileContents = await System.IO.File.ReadAllBytesAsync(previewPath);
+                return File(fileContents, contentType ?? "application/octet-stream", Path.GetFileName(previewPath));
+            }
+
+            var originalPath = Path.Combine(rootFolder, "images", filename);
+            if (!System.IO.File.Exists(originalPath)) {
                 return NotFound();
             }
 
-            new FileExtensionContentTypeProvider().TryGetContentType(Path.GetFileName(filepath), out var contentType);
-            var fileContents = await System.IO.File.ReadAllBytesAsync(filepath);
-
-            return File(fileContents, contentType ?? "application/octet-stream", Path.GetFileName(filepath));
+            new FileExtensionContentTypeProvider().TryGetContentType(Path.GetFileName(originalPath), out var contentType2);
+            var originalContents = await System.IO.File.ReadAllBytesAsync(originalPath);
+            return File(originalContents, contentType2 ?? "application/octet-stream", Path.GetFileName(originalPath));
         }
     }
 }
