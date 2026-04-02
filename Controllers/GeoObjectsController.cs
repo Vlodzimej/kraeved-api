@@ -145,14 +145,14 @@ namespace KraevedAPI.Controllers
             try
             {
                 var result = await _kraevedService.GetPersonsByGeoObjectId(id);
-                var dtos = result.Select(p => new PersonBriefDto
+                var dtos = result.Where(p => p != null).Select(p => new PersonBriefDto
                 {
-                    Id = p.Id,
-                    Surname = p.Surname,
-                    FirstName = p.FirstName,
-                    Patronymic = p.Patronymic,
-                    BirthDate = p.BirthDate,
-                    DeathDate = p.DeathDate,
+                    Id = p!.Id,
+                    Surname = p!.Surname,
+                    FirstName = p!.FirstName,
+                    Patronymic = p!.Patronymic,
+                    BirthDate = p!.BirthDate,
+                    DeathDate = p!.DeathDate,
                 });
                 return Ok(dtos);
             }

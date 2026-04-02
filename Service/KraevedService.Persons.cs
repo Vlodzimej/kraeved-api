@@ -64,9 +64,13 @@ namespace KraevedAPI.Service
 
         public async Task<IEnumerable<Person>> GetPersonsByGeoObjectId(int geoObjectId)
         {
-            return _unitOfWork.PersonGeoObjectsRepository.Get(x => x.GeoObjectId == geoObjectId)
-                .Select(pg => pg.Person)
-                .ToList();
+            return _unitOfWork.PersonGeoObjectsRepository.Get(
+                x => x.GeoObjectId == geoObjectId,
+                includeProperties: "Person"
+            )
+            .Select(pg => pg.Person)
+            .Where(p => p != null)
+            .ToList();
         }
 
         public async Task<IEnumerable<GeoObject>> GetGeoObjectsByPersonId(int personId)
