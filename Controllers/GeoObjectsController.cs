@@ -134,5 +134,32 @@ namespace KraevedAPI.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Получить персоны, привязанные к гео-объекту
+        /// </summary>
+        [HttpGet("{id}/persons")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<PersonBriefDto>>> GetPersonsByGeoObjectId(int id)
+        {
+            try
+            {
+                var result = await _kraevedService.GetPersonsByGeoObjectId(id);
+                var dtos = result.Select(p => new PersonBriefDto
+                {
+                    Id = p.Id,
+                    Surname = p.Surname,
+                    FirstName = p.FirstName,
+                    Patronymic = p.Patronymic,
+                    BirthDate = p.BirthDate,
+                    DeathDate = p.DeathDate,
+                });
+                return Ok(dtos);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
     }
 }

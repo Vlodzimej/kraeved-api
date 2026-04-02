@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace KraevedAPI.Models
 {
     /// <summary>
@@ -48,6 +50,7 @@ namespace KraevedAPI.Models
         /// <summary>
         /// Связанные гео-объекты
         /// </summary>
+        [JsonIgnore]
         public List<PersonGeoObject>? PersonGeoObjects { get; set; }
     }
 }

@@ -13,5 +13,6 @@ namespace KraevedAPI.Service
         Task<IEnumerable<GeoObject>> GetGeoObjectsByPersonId(int personId);
         Task<bool> LinkPersonToGeoObject(int personId, int geoObjectId);
         Task<bool> UnlinkPersonFromGeoObject(int personId, int geoObjectId);
+        Task<IEnumerable<Person>> SearchPersons(string query);
     }
 }

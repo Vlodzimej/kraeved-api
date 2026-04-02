@@ -62,6 +62,7 @@
         /// <summary>
         /// Связанные персоны
         /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
         public List<PersonGeoObject>? PersonGeoObjects { get; set; }
     }
 }

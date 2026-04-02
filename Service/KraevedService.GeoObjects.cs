@@ -14,7 +14,7 @@ namespace KraevedAPI.Service
         {
             var filter = new GeoObjectFilter() { Id = id };
             var result = _unitOfWork.GeoObjectsRepository
-                .Get(x => filter.Id == null || x.Id == filter.Id, includeProperties: "Type")
+                .Get(x => filter.Id == null || x.Id == filter.Id, includeProperties: "Type,PersonGeoObjects.Person")
                 ?? throw new Exception(ServiceConstants.Exception.UnknownError);
 
             var geoObject = result.FirstOrDefault();

@@ -85,6 +85,15 @@ namespace KraevedAPI.Controllers
             var result = await _kraevedService.UnlinkPersonFromGeoObject(request.PersonId, request.GeoObjectId);
             return Ok(result);
         }
+
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<Person>>> SearchPersons([FromQuery] string q)
+        {
+            if (string.IsNullOrWhiteSpace(q) || q.Length < 3) return Ok(Array.Empty<Person>());
+            var result = await _kraevedService.SearchPersons(q);
+            return Ok(result);
+        }
     }
 
     public class LinkRequest

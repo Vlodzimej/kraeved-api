@@ -97,5 +97,15 @@ namespace KraevedAPI.Service
             await _unitOfWork.SaveAsync();
             return true;
         }
+
+        public async Task<IEnumerable<Person>> SearchPersons(string query)
+        {
+            var q = query.Trim().ToLower();
+            return _unitOfWork.PersonsRepository.Get(
+                x => x.Surname.ToLower().Contains(q) ||
+                     x.FirstName.ToLower().Contains(q) ||
+                     (x.Patronymic != null && x.Patronymic.ToLower().Contains(q))
+            ).Take(20).ToList();
+        }
     }
 }
