@@ -10,6 +10,12 @@ namespace KraevedAPI.Helpers
         {
             CreateMap<GeoObject, GeoObjectBrief>()
             .ForMember(
+                dest => dest.TypeId,
+                src => src.MapFrom(
+                    item => item.Type != null ? item.Type.Id : null
+                )
+            )
+            .ForMember(
                 dest => dest.TypeName,
                 src => src.MapFrom(
                     item => item.Type != null ? item.Type.Name : "UNKNOWN"

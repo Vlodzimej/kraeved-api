@@ -22,6 +22,7 @@ namespace KraevedAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<GeoObjectType?>> GetGeoObjectTypeById(int id)
         {
             GeoObjectType? result = null;
@@ -42,6 +43,7 @@ namespace KraevedAPI.Controllers
         /// <param name="regionId"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<GeoObjectType>>> GetAllGeoObjectTypes() 
         {
             IEnumerable<GeoObjectType>? result;

@@ -23,6 +23,7 @@ namespace KraevedAPI.Controllers
         /// <param name="id">Идентификатор категории</param>
         /// <returns>Категория гео-объекта</returns>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<GeoObjectCategory?>> GetGeoObjectCategoryById(int id)
         {
             GeoObjectCategory? result = null;
@@ -43,6 +44,7 @@ namespace KraevedAPI.Controllers
         /// </summary>
         /// <returns>Список категорий</returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<GeoObjectCategory>>> GetAllGeoObjectCategories()
         {
             IEnumerable<GeoObjectCategory>? result;

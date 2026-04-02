@@ -26,6 +26,11 @@ namespace KraevedAPI.Models
         public string? TypeName { get; set; }
 
         /// <summary>
+        /// Идентификатор типа
+        /// </summary>
+        public int? TypeId { get; set; }
+
+        /// <summary>
         /// Отображаемое название типа
         /// </summary>
         public string? TypeTitle { get; set; }
