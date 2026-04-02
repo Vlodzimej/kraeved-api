@@ -96,7 +96,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api/Images/filename"), appBuilder =>
+app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api/Images"), appBuilder =>
 {
     appBuilder.UseMiddleware<ResponseWrapperMiddleware>();
 });
