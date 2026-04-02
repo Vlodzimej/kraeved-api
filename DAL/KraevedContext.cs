@@ -17,5 +17,23 @@ namespace KraevedAPI.DAL
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<GeoObjectCategory> GeoObjectCategories => Set<GeoObjectCategory>();
         public DbSet<GeoObjectType> GeoObjectTypes => Set<GeoObjectType>();
+        public DbSet<Person> Persons => Set<Person>();
+        public DbSet<PersonGeoObject> PersonGeoObjects => Set<PersonGeoObject>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PersonGeoObject>()
+                .HasKey(pg => new { pg.PersonId, pg.GeoObjectId });
+
+            modelBuilder.Entity<PersonGeoObject>()
+                .HasOne(pg => pg.Person)
+                .WithMany(p => p.PersonGeoObjects)
+                .HasForeignKey(pg => pg.PersonId);
+
+            modelBuilder.Entity<PersonGeoObject>()
+                .HasOne(pg => pg.GeoObject)
+                .WithMany(g => g.PersonGeoObjects)
+                .HasForeignKey(pg => pg.GeoObjectId);
+        }
     }
 }

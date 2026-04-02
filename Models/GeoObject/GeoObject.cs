@@ -58,5 +58,10 @@
         /// </summary>
         /// <value></value>
         public string? Thumbnail { get; set; }
+
+        /// <summary>
+        /// Связанные персоны
+        /// </summary>
+        public List<PersonGeoObject>? PersonGeoObjects { get; set; }
     }
 }
