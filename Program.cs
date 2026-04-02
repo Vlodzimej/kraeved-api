@@ -23,6 +23,13 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod()
               .AllowCredentials();
     });
+    options.AddPolicy("AllowAngularProd", policy =>
+    {
+        policy.WithOrigins("http://localhost:80")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
 });
 
 builder.Services.AddControllers(options =>
@@ -54,15 +61,23 @@ builder.Services.AddAuthentication(opt =>
 })
 .AddJwtBearer(x =>
 {
-	x.RequireHttpsMetadata = false;
-	x.SaveToken = true;
-	x.TokenValidationParameters = new TokenValidationParameters
-	{
-		ValidateIssuerSigningKey = true,
-		IssuerSigningKey = new SymmetricSecurityKey(key),
-		ValidateIssuer = false,
-		ValidateAudience = false
-	};
+ 	x.RequireHttpsMetadata = false;
+ 	x.SaveToken = true;
+ 	x.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+ 	{
+ 		OnMessageReceived = context =>
+ 		{
+ 			context.Token = context.Request.Cookies["auth_token"];
+ 			return Task.CompletedTask;
+ 		}
+ 	};
+ 	x.TokenValidationParameters = new TokenValidationParameters
+ 	{
+ 		ValidateIssuerSigningKey = true,
+ 		IssuerSigningKey = new SymmetricSecurityKey(key),
+ 		ValidateIssuer = false,
+ 		ValidateAudience = false
+ 	};
 });
 
 builder.Services.AddHttpClient();

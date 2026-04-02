@@ -29,7 +29,25 @@ namespace KraevedAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
 
+            if (result?.Token != null) {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTime.UtcNow.AddDays(30),
+                    Path = "/",
+                };
+                Response.Cookies.Append("auth_token", result.Token, cookieOptions);
+            }
+
             return Ok(result);
+        }
+
+        [HttpPost("logout")]
+        public ActionResult Logout() {
+            Response.Cookies.Delete("auth_token");
+            return Ok();
         }
 
         [HttpPost]
