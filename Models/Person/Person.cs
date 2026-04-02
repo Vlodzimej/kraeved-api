@@ -33,12 +33,12 @@ namespace KraevedAPI.Models
         /// <summary>
         /// Дата рождения
         /// </summary>
-        public DateTime? BirthDate { get; set; }
+        public DateOnly? BirthDate { get; set; }
 
         /// <summary>
         /// Дата смерти
         /// </summary>
-        public DateTime? DeathDate { get; set; }
+        public DateOnly? DeathDate { get; set; }
 
         /// <summary>
         /// Список фотографий (имена файлов)
