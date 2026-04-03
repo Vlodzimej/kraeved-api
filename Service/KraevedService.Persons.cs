@@ -235,16 +235,20 @@ namespace KraevedAPI.Service
                 BirthDate = person?.BirthDate,
                 DeathDate = person?.DeathDate,
                 Photos = person?.Photos,
+                Parents = new List<PersonTreeNode>(),
                 Spouses = new List<PersonRelationDto>(),
                 Children = new List<PersonRelationDto>(),
                 Siblings = new List<PersonRelationDto>(),
             };
 
-            var personRelations = allRelations.Where(r => r.PersonId1 == personId).ToList();
+            var personRelationsAs1 = allRelations.Where(r => r.PersonId1 == personId).ToList();
+            var personRelationsAs2 = allRelations.Where(r => r.PersonId2 == personId).ToList();
+            var allPersonRelations = personRelationsAs1.Concat(personRelationsAs2).ToList();
 
-            foreach (var rel in personRelations)
+            foreach (var rel in allPersonRelations)
             {
-                var relatedPerson = _unitOfWork.PersonsRepository.GetByID(rel.PersonId2);
+                var relatedPersonId = rel.PersonId1 == personId ? rel.PersonId2 : rel.PersonId1;
+                var relatedPerson = _unitOfWork.PersonsRepository.GetByID(relatedPersonId);
                 if (relatedPerson == null) continue;
 
                 var dto = new PersonRelationDto
@@ -260,9 +264,9 @@ namespace KraevedAPI.Service
                 };
 
                 var relName = rel.RelationType?.Name?.ToLower();
-                if (relName == "father")
+                if (relName == "parent")
                 {
-                    node.Father = new PersonTreeNode
+                    node.Parents.Add(new PersonTreeNode
                     {
                         Id = relatedPerson.Id ?? 0,
                         Surname = relatedPerson.Surname,
@@ -271,30 +275,17 @@ namespace KraevedAPI.Service
                         BirthDate = relatedPerson.BirthDate,
                         DeathDate = relatedPerson.DeathDate,
                         Photos = relatedPerson.Photos,
-                    };
+                    });
                 }
-                else if (relName == "mother")
-                {
-                    node.Mother = new PersonTreeNode
-                    {
-                        Id = relatedPerson.Id ?? 0,
-                        Surname = relatedPerson.Surname,
-                        FirstName = relatedPerson.FirstName,
-                        Patronymic = relatedPerson.Patronymic,
-                        BirthDate = relatedPerson.BirthDate,
-                        DeathDate = relatedPerson.DeathDate,
-                        Photos = relatedPerson.Photos,
-                    };
-                }
-                else if (relName == "son" || relName == "daughter")
+                else if (relName == "child")
                 {
                     node.Children.Add(dto);
                 }
-                else if (relName == "brother" || relName == "sister")
+                else if (relName == "sibling")
                 {
                     node.Siblings.Add(dto);
                 }
-                else if (relName == "husband" || relName == "wife")
+                else if (relName == "spouse")
                 {
                     node.Spouses.Add(dto);
                 }
