@@ -24,7 +24,11 @@ namespace KraevedAPI.Service
             };
             _unitOfWork.CommentsRepository.Insert(comment);
             await _unitOfWork.SaveAsync();
-            return comment;
+            
+            return _unitOfWork.CommentsRepository.Get(
+                x => x.Id == comment.Id,
+                includeProperties: "User"
+            ).FirstOrDefault() ?? comment;
         }
 
         public async Task<Comment?> DeleteComment(int commentId, int userId)
