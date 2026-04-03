@@ -100,7 +100,7 @@ namespace kraeved.Migrations
                 ON CONFLICT (""Id"") DO NOTHING;
 
                 -- Сброс счётчиков
-                ALTER SEQUENCE ""GeoObjectTypes_Id_seq"" RESTART WITH 506;
+                ALTER SEQUENCE ""GeoObjectType_Id_seq"" RESTART WITH 506;
                 ALTER SEQUENCE ""GeoObjectCategories_Id_seq"" RESTART WITH 6;
                 ALTER SEQUENCE ""PersonRelationTypes_Id_seq"" RESTART WITH 7;
                 ALTER SEQUENCE ""Users_Id_seq"" RESTART WITH 2;
