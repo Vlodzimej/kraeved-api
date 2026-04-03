@@ -260,7 +260,7 @@ namespace KraevedAPI.Service
             {
                 Subject = new ClaimsIdentity(
                 [
-                    new Claim(ClaimTypes.Name, userId.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                     new Claim(ClaimsIdentity.DefaultRoleClaimType, role.Name),
                 ]),
                 Expires = DateTime.UtcNow.AddDays(7),
