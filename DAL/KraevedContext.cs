@@ -22,6 +22,7 @@ namespace KraevedAPI.DAL
         public DbSet<PersonRelationType> PersonRelationTypes => Set<PersonRelationType>();
         public DbSet<PersonRelation> PersonRelations => Set<PersonRelation>();
         public DbSet<AppSetting> AppSettings => Set<AppSetting>();
+        public DbSet<Comment> Comments => Set<Comment>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

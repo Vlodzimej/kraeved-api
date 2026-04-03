@@ -64,5 +64,11 @@
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
         public List<PersonGeoObject>? PersonGeoObjects { get; set; }
+
+        /// <summary>
+        /// Комментарии
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public List<Comment>? Comments { get; set; }
     }
 }

@@ -18,6 +18,7 @@ namespace KraevedAPI.DAL
         GenericRepository<PersonRelationType> PersonRelationTypesRepository { get; }
         GenericRepository<PersonRelation> PersonRelationsRepository { get; }
         GenericRepository<AppSetting> AppSettingsRepository { get; }
+        GenericRepository<Comment> CommentsRepository { get; }
         RolesRepository RolesRepository { get; }
 
         void Save();

@@ -175,6 +175,20 @@ namespace KraevedAPI.DAL
             }
         }
 
+        private GenericRepository<Comment>? commentsRepository;
+
+        public GenericRepository<Comment> CommentsRepository
+        {
+            get
+            {
+                if (this.commentsRepository == null)
+                {
+                    this.commentsRepository = new GenericRepository<Comment>(context);
+                }
+                return commentsRepository;
+            }
+        }
+
         private RolesRepository? rolesRepository;
         public RolesRepository RolesRepository
         {
