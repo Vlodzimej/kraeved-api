@@ -34,7 +34,7 @@ namespace KraevedAPI.Controllers
                 {
                     HttpOnly = true,
                     Secure = false,
-                    SameSite = SameSiteMode.Lax,
+                    SameSite = (SameSiteMode)(-1),
                     Expires = DateTime.UtcNow.AddDays(30),
                     Path = "/",
                 };
