@@ -94,6 +94,43 @@ namespace KraevedAPI.Controllers
             var result = await _kraevedService.SearchPersons(q);
             return Ok(result);
         }
+
+        [HttpGet("relation-types")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<PersonRelationType>>> GetAllRelationTypes()
+        {
+            var result = await _kraevedService.GetAllRelationTypes();
+            return Ok(result);
+        }
+
+        [HttpGet("{id}/relations")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<PersonRelationDto>>> GetRelationsByPersonId(int id)
+        {
+            var result = await _kraevedService.GetRelationsByPersonId(id);
+            return Ok(result);
+        }
+
+        [HttpPost("relation")]
+        public async Task<ActionResult> AddRelation([FromBody] RelationRequest request)
+        {
+            var result = await _kraevedService.AddRelation(request.PersonId1, request.PersonId2, request.RelationTypeId);
+            return Ok(result);
+        }
+
+        [HttpDelete("relation")]
+        public async Task<ActionResult> RemoveRelation([FromBody] RelationRequest request)
+        {
+            var result = await _kraevedService.RemoveRelation(request.PersonId1, request.PersonId2, request.RelationTypeId);
+            return Ok(result);
+        }
+    }
+
+    public class RelationRequest
+    {
+        public int PersonId1 { get; set; }
+        public int PersonId2 { get; set; }
+        public int RelationTypeId { get; set; }
     }
 
     public class LinkRequest

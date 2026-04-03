@@ -133,6 +133,34 @@ namespace KraevedAPI.DAL
             }
         }
 
+        private GenericRepository<PersonRelationType>? personRelationTypesRepository;
+
+        public GenericRepository<PersonRelationType> PersonRelationTypesRepository
+        {
+            get
+            {
+                if (this.personRelationTypesRepository == null)
+                {
+                    this.personRelationTypesRepository = new GenericRepository<PersonRelationType>(context);
+                }
+                return personRelationTypesRepository;
+            }
+        }
+
+        private GenericRepository<PersonRelation>? personRelationsRepository;
+
+        public GenericRepository<PersonRelation> PersonRelationsRepository
+        {
+            get
+            {
+                if (this.personRelationsRepository == null)
+                {
+                    this.personRelationsRepository = new GenericRepository<PersonRelation>(context);
+                }
+                return personRelationsRepository;
+            }
+        }
+
         private RolesRepository? rolesRepository;
         public RolesRepository RolesRepository
         {

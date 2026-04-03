@@ -111,5 +111,107 @@ namespace KraevedAPI.Service
                      (x.Patronymic != null && x.Patronymic.ToLower().Contains(q))
             ).Take(20).ToList();
         }
+
+        public async Task<IEnumerable<PersonRelationType>> GetAllRelationTypes()
+        {
+            return _unitOfWork.PersonRelationTypesRepository.Get().ToList();
+        }
+
+        public async Task<IEnumerable<PersonRelationDto>> GetRelationsByPersonId(int personId)
+        {
+            var relations = _unitOfWork.PersonRelationsRepository.Get(
+                x => x.PersonId1 == personId || x.PersonId2 == personId,
+                includeProperties: "RelationType"
+            ).ToList();
+
+            var result = new List<PersonRelationDto>();
+
+            foreach (var rel in relations)
+            {
+                var otherPerson = rel.PersonId1 == personId
+                    ? _unitOfWork.PersonsRepository.GetByID(rel.PersonId2)
+                    : _unitOfWork.PersonsRepository.GetByID(rel.PersonId1);
+
+                if (otherPerson != null)
+                {
+                    result.Add(new PersonRelationDto
+                    {
+                        PersonId = otherPerson.Id ?? 0,
+                        Surname = otherPerson.Surname,
+                        FirstName = otherPerson.FirstName,
+                        Patronymic = otherPerson.Patronymic,
+                        BirthDate = otherPerson.BirthDate,
+                        DeathDate = otherPerson.DeathDate,
+                        Photos = otherPerson.Photos,
+                        RelationTitle = rel.RelationType?.Title,
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<bool> AddRelation(int personId1, int personId2, int relationTypeId)
+        {
+            var exists = _unitOfWork.PersonRelationsRepository.Get(
+                x => x.PersonId1 == personId1 && x.PersonId2 == personId2 && x.RelationTypeId == relationTypeId
+            ).Any();
+            if (exists) return false;
+
+            _unitOfWork.PersonRelationsRepository.Insert(new PersonRelation
+            {
+                PersonId1 = personId1,
+                PersonId2 = personId2,
+                RelationTypeId = relationTypeId,
+            });
+
+            // Add reverse relation if paired type exists
+            var relationType = _unitOfWork.PersonRelationTypesRepository.GetByID(relationTypeId);
+            if (relationType?.PairedTypeId != null)
+            {
+                var reverseExists = _unitOfWork.PersonRelationsRepository.Get(
+                    x => x.PersonId1 == personId2 && x.PersonId2 == personId1 && x.RelationTypeId == relationType.PairedTypeId
+                ).Any();
+                if (!reverseExists)
+                {
+                    _unitOfWork.PersonRelationsRepository.Insert(new PersonRelation
+                    {
+                        PersonId1 = personId2,
+                        PersonId2 = personId1,
+                        RelationTypeId = relationType.PairedTypeId.Value,
+                    });
+                }
+            }
+
+            await _unitOfWork.SaveAsync();
+            return true;
+        }
+
+        public async Task<bool> RemoveRelation(int personId1, int personId2, int relationTypeId)
+        {
+            var rel = _unitOfWork.PersonRelationsRepository.Get(
+                x => x.PersonId1 == personId1 && x.PersonId2 == personId2 && x.RelationTypeId == relationTypeId
+            ).FirstOrDefault();
+            if (rel == null) return false;
+
+            var relationType = _unitOfWork.PersonRelationTypesRepository.GetByID(relationTypeId);
+
+            _unitOfWork.PersonRelationsRepository.Delete(rel);
+
+            // Remove reverse relation
+            if (relationType?.PairedTypeId != null)
+            {
+                var reverseRel = _unitOfWork.PersonRelationsRepository.Get(
+                    x => x.PersonId1 == personId2 && x.PersonId2 == personId1 && x.RelationTypeId == relationType.PairedTypeId
+                ).FirstOrDefault();
+                if (reverseRel != null)
+                {
+                    _unitOfWork.PersonRelationsRepository.Delete(reverseRel);
+                }
+            }
+
+            await _unitOfWork.SaveAsync();
+            return true;
+        }
     }
 }

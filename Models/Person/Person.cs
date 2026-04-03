@@ -52,5 +52,17 @@ namespace KraevedAPI.Models
         /// </summary>
         [JsonIgnore]
         public List<PersonGeoObject>? PersonGeoObjects { get; set; }
+
+        /// <summary>
+        /// Родственные связи (как Person1)
+        /// </summary>
+        [JsonIgnore]
+        public List<PersonRelation>? RelationsFrom { get; set; }
+
+        /// <summary>
+        /// Родственные связи (как Person2)
+        /// </summary>
+        [JsonIgnore]
+        public List<PersonRelation>? RelationsTo { get; set; }
     }
 }

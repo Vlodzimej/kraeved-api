@@ -14,5 +14,9 @@ namespace KraevedAPI.Service
         Task<bool> LinkPersonToGeoObject(int personId, int geoObjectId);
         Task<bool> UnlinkPersonFromGeoObject(int personId, int geoObjectId);
         Task<IEnumerable<Person>> SearchPersons(string query);
+        Task<IEnumerable<PersonRelationType>> GetAllRelationTypes();
+        Task<IEnumerable<PersonRelationDto>> GetRelationsByPersonId(int personId);
+        Task<bool> AddRelation(int personId1, int personId2, int relationTypeId);
+        Task<bool> RemoveRelation(int personId1, int personId2, int relationTypeId);
     }
 }

@@ -19,6 +19,8 @@ namespace KraevedAPI.DAL
         public DbSet<GeoObjectType> GeoObjectTypes => Set<GeoObjectType>();
         public DbSet<Person> Persons => Set<Person>();
         public DbSet<PersonGeoObject> PersonGeoObjects => Set<PersonGeoObject>();
+        public DbSet<PersonRelationType> PersonRelationTypes => Set<PersonRelationType>();
+        public DbSet<PersonRelation> PersonRelations => Set<PersonRelation>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +36,32 @@ namespace KraevedAPI.DAL
                 .HasOne(pg => pg.GeoObject)
                 .WithMany(g => g.PersonGeoObjects)
                 .HasForeignKey(pg => pg.GeoObjectId);
+
+            modelBuilder.Entity<PersonRelation>()
+                .HasKey(pr => new { pr.PersonId1, pr.PersonId2, pr.RelationTypeId });
+
+            modelBuilder.Entity<PersonRelation>()
+                .HasOne(pr => pr.Person1)
+                .WithMany(p => p.RelationsFrom)
+                .HasForeignKey(pr => pr.PersonId1)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PersonRelation>()
+                .HasOne(pr => pr.Person2)
+                .WithMany(p => p.RelationsTo)
+                .HasForeignKey(pr => pr.PersonId2)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PersonRelation>()
+                .HasOne(pr => pr.RelationType)
+                .WithMany()
+                .HasForeignKey(pr => pr.RelationTypeId);
+
+            modelBuilder.Entity<PersonRelationType>()
+                .HasOne(prt => prt.PairedType)
+                .WithMany()
+                .HasForeignKey(prt => prt.PairedTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

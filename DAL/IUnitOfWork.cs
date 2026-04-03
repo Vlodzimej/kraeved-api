@@ -15,6 +15,8 @@ namespace KraevedAPI.DAL
         GenericRepository<SmsCode> SmsCodesRepository { get; }
         GenericRepository<Person> PersonsRepository { get; }
         GenericRepository<PersonGeoObject> PersonGeoObjectsRepository { get; }
+        GenericRepository<PersonRelationType> PersonRelationTypesRepository { get; }
+        GenericRepository<PersonRelation> PersonRelationsRepository { get; }
         RolesRepository RolesRepository { get; }
 
         void Save();
