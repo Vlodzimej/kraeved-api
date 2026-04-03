@@ -25,6 +25,7 @@ namespace KraevedAPI.Models
         /// </summary>
         public int? PairedTypeId { get; set; }
 
+        [System.Text.Json.Serialization.JsonIgnore]
         public PersonRelationType? PairedType { get; set; }
     }
 }
