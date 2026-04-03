@@ -13,6 +13,15 @@ namespace KraevedAPI.Service
             ).ToList();
         }
 
+        public async Task<Comment?> GetLatestCommentByGeoObjectId(int geoObjectId)
+        {
+            return _unitOfWork.CommentsRepository.Get(
+                x => x.GeoObjectId == geoObjectId,
+                includeProperties: "User",
+                orderBy: q => q.OrderByDescending(c => c.CreatedAt)
+            ).FirstOrDefault();
+        }
+
         public async Task<Comment> AddComment(int geoObjectId, int userId, string text)
         {
             var comment = new Comment

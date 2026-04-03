@@ -24,6 +24,14 @@ namespace KraevedAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("geo-object/{geoObjectId}/latest")]
+        [AllowAnonymous]
+        public async Task<ActionResult<Comment?>> GetLatestCommentByGeoObjectId(int geoObjectId)
+        {
+            var result = await _kraevedService.GetLatestCommentByGeoObjectId(geoObjectId);
+            return Ok(result);
+        }
+
         [HttpPost]
         [Authorize]
         public async Task<ActionResult> AddComment([FromBody] CommentRequest request)
