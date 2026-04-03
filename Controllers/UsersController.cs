@@ -50,7 +50,7 @@ namespace KraevedAPI.Controllers
         }
 
         [HttpPost("current/avatar")]
-        public async Task<ActionResult> UploadAvatar(IFormFile avatar)
+        public async Task<ActionResult> UploadAvatar([FromForm] IFormFile avatar)
         {
             try
             {

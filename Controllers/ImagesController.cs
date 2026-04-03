@@ -88,5 +88,22 @@ namespace KraevedAPI.Controllers
             var originalContents = await System.IO.File.ReadAllBytesAsync(originalPath);
             return File(originalContents, contentType2 ?? "application/octet-stream", Path.GetFileName(originalPath));
         }
+
+        [AllowAnonymous]
+        [HttpGet("avatar/{filename}")]
+        public async Task<ActionResult<String>?> DownloadAvatar(string filename) {
+            var rootFolder = Directory.GetCurrentDirectory();
+            var path = Path.Combine(rootFolder, "avatars");
+
+            var filepath = Path.Combine(path, filename);
+            if (!System.IO.File.Exists(filepath)) {
+                return NotFound();
+            }
+
+            new FileExtensionContentTypeProvider().TryGetContentType(Path.GetFileName(filepath), out var contentType);
+            var fileContents = await System.IO.File.ReadAllBytesAsync(filepath);
+
+            return File(fileContents, contentType ?? "application/octet-stream", Path.GetFileName(filepath));
+        }
     }
 }
