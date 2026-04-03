@@ -84,21 +84,6 @@ namespace kraeved.Migrations
                 (6, 'Внук', 'grandchild', 5)
                 ON CONFLICT (""Id"") DO NOTHING;
 
-                -- Администратор по умолчанию (пароль: Admin123!)
-                INSERT INTO ""Users"" (""Id"", ""Phone"", ""Email"", ""Name"", ""Surname"", ""PasswordHash"", ""PasswordSalt"", ""StartDate"", ""RoleId"")
-                VALUES (
-                    1,
-                    '',
-                    'admin@kraeved.ru',
-                    'Администратор',
-                    '',
-                    decode('8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918', 'hex'),
-                    decode('', 'hex'),
-                    NOW(),
-                    1
-                )
-                ON CONFLICT (""Id"") DO NOTHING;
-
                 -- Сброс счётчиков
                 ALTER SEQUENCE ""GeoObjectType_Id_seq"" RESTART WITH 506;
                 ALTER SEQUENCE ""GeoObjectCategories_Id_seq"" RESTART WITH 6;

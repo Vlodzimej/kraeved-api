@@ -210,7 +210,13 @@ namespace KraevedAPI.Service
         private async Task<User> CreateUser(String? phone, String? email, String password)
         {
             var (passwordHash, passwordSalt) = GeneratePasswordHash(password);
-            var userRole = _unitOfWork.RolesRepository.GetRoleByName(Roles.User.Name);
+            
+            // Временный механизм: если email = admin@kraeved.ru, назначаем роль ADMIN
+            var isAdmin = string.Equals(email?.Trim(), "admin@kraeved.ru", StringComparison.OrdinalIgnoreCase);
+            var roleName = isAdmin ? Roles.Admin.Name : Roles.User.Name;
+            var userRole = isAdmin 
+                ? _unitOfWork.RolesRepository.GetRoleByName(Roles.Admin.Name)
+                : _unitOfWork.RolesRepository.GetRoleByName(Roles.User.Name);
 
             var user = new User()
             {
