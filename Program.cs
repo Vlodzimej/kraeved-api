@@ -105,7 +105,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-app.UseCors("AllowAngularDev");
+app.UseCors(app.Environment.IsDevelopment() ? "AllowAngularDev" : "AllowAngularProd");
 
 app.UseAuthorization();
 
