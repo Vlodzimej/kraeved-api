@@ -241,14 +241,11 @@ namespace KraevedAPI.Service
                 Siblings = new List<PersonRelationDto>(),
             };
 
-            var personRelationsAs1 = allRelations.Where(r => r.PersonId1 == personId).ToList();
-            var personRelationsAs2 = allRelations.Where(r => r.PersonId2 == personId).ToList();
-            var allPersonRelations = personRelationsAs1.Concat(personRelationsAs2).ToList();
+            var personRelations = allRelations.Where(r => r.PersonId1 == personId).ToList();
 
-            foreach (var rel in allPersonRelations)
+            foreach (var rel in personRelations)
             {
-                var relatedPersonId = rel.PersonId1 == personId ? rel.PersonId2 : rel.PersonId1;
-                var relatedPerson = _unitOfWork.PersonsRepository.GetByID(relatedPersonId);
+                var relatedPerson = _unitOfWork.PersonsRepository.GetByID(rel.PersonId2);
                 if (relatedPerson == null) continue;
 
                 var dto = new PersonRelationDto

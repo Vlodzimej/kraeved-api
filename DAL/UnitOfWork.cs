@@ -161,6 +161,20 @@ namespace KraevedAPI.DAL
             }
         }
 
+        private GenericRepository<AppSetting>? appSettingsRepository;
+
+        public GenericRepository<AppSetting> AppSettingsRepository
+        {
+            get
+            {
+                if (this.appSettingsRepository == null)
+                {
+                    this.appSettingsRepository = new GenericRepository<AppSetting>(context);
+                }
+                return appSettingsRepository;
+            }
+        }
+
         private RolesRepository? rolesRepository;
         public RolesRepository RolesRepository
         {

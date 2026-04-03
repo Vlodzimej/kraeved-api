@@ -21,6 +21,7 @@ namespace KraevedAPI.DAL
         public DbSet<PersonGeoObject> PersonGeoObjects => Set<PersonGeoObject>();
         public DbSet<PersonRelationType> PersonRelationTypes => Set<PersonRelationType>();
         public DbSet<PersonRelation> PersonRelations => Set<PersonRelation>();
+        public DbSet<AppSetting> AppSettings => Set<AppSetting>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
