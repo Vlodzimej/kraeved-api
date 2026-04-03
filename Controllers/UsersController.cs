@@ -49,6 +49,21 @@ namespace KraevedAPI.Controllers
             }
         }
 
+        [HttpPost("current/avatar")]
+        public async Task<ActionResult> UploadAvatar(IFormFile avatar)
+        {
+            try
+            {
+                var result = await _kraevedService.UploadUserAvatar(avatar);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while uploading user avatar.");
+                return StatusCode(500, new { ex.Message });
+            }
+        }
+
         [HttpGet("all")]
         [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult> GetAllUsers()

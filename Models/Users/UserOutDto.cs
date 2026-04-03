@@ -42,5 +42,10 @@ namespace KraevedAPI.Models
         /// Роль пользователя
         /// </summary>
         public required string Role { get; set; }
+
+        /// <summary>
+        /// Аватар пользователя (имя файла)
+        /// </summary>
+        public string? Avatar { get; set; }
     }
 }

@@ -6,5 +6,6 @@ namespace KraevedAPI.Service
     {
         Task<UserOutDto> GetCurrentUserInfo();
         Task<UserOutDto> PatchUser(UserInDto userInDto);
+        Task<UserOutDto> UploadUserAvatar(IFormFile avatar);
     }
 }

@@ -63,5 +63,10 @@ namespace KraevedAPI.Models
         /// <value></value>
         [ForeignKey("RoleId")]
         public Role Role { get; set; }
+
+        /// <summary>
+        /// Аватар пользователя (имя файла)
+        /// </summary>
+        public string? Avatar { get; set; }
     }
 }
