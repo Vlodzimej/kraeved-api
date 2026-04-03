@@ -120,7 +120,7 @@ namespace KraevedAPI.Service
         public async Task<IEnumerable<PersonRelationDto>> GetRelationsByPersonId(int personId)
         {
             var relations = _unitOfWork.PersonRelationsRepository.Get(
-                x => x.PersonId1 == personId || x.PersonId2 == personId,
+                x => x.PersonId1 == personId,
                 includeProperties: "RelationType"
             ).ToList();
 
@@ -190,20 +190,25 @@ namespace KraevedAPI.Service
         public async Task<bool> RemoveRelation(int personId1, int personId2, int relationTypeId)
         {
             var rel = _unitOfWork.PersonRelationsRepository.Get(
-                x => x.PersonId1 == personId1 && x.PersonId2 == personId2 && x.RelationTypeId == relationTypeId
+                x => x.RelationTypeId == relationTypeId &&
+                     ((x.PersonId1 == personId1 && x.PersonId2 == personId2) ||
+                      (x.PersonId1 == personId2 && x.PersonId2 == personId1))
             ).FirstOrDefault();
+            
             if (rel == null) return false;
 
-            var relationType = _unitOfWork.PersonRelationTypesRepository.GetByID(relationTypeId);
+            var relationType = _unitOfWork.PersonRelationTypesRepository.GetByID(rel.RelationTypeId);
 
             _unitOfWork.PersonRelationsRepository.Delete(rel);
 
-            // Remove reverse relation
             if (relationType?.PairedTypeId != null)
             {
                 var reverseRel = _unitOfWork.PersonRelationsRepository.Get(
-                    x => x.PersonId1 == personId2 && x.PersonId2 == personId1 && x.RelationTypeId == relationType.PairedTypeId
+                    x => x.RelationTypeId == relationType.PairedTypeId &&
+                         ((x.PersonId1 == personId1 && x.PersonId2 == personId2) ||
+                          (x.PersonId1 == personId2 && x.PersonId2 == personId1))
                 ).FirstOrDefault();
+                
                 if (reverseRel != null)
                 {
                     _unitOfWork.PersonRelationsRepository.Delete(reverseRel);
@@ -212,6 +217,90 @@ namespace KraevedAPI.Service
 
             await _unitOfWork.SaveAsync();
             return true;
+        }
+
+        public async Task<PersonTreeNode> GetFamilyTree(int personId)
+        {
+            var person = _unitOfWork.PersonsRepository.GetByID(personId);
+            var allRelations = _unitOfWork.PersonRelationsRepository.Get(
+                includeProperties: "RelationType"
+            ).ToList();
+
+            var node = new PersonTreeNode
+            {
+                Id = person?.Id ?? personId,
+                Surname = person?.Surname,
+                FirstName = person?.FirstName,
+                Patronymic = person?.Patronymic,
+                BirthDate = person?.BirthDate,
+                DeathDate = person?.DeathDate,
+                Photos = person?.Photos,
+                Spouses = new List<PersonRelationDto>(),
+                Children = new List<PersonRelationDto>(),
+                Siblings = new List<PersonRelationDto>(),
+            };
+
+            var personRelations = allRelations.Where(r => r.PersonId1 == personId).ToList();
+
+            foreach (var rel in personRelations)
+            {
+                var relatedPerson = _unitOfWork.PersonsRepository.GetByID(rel.PersonId2);
+                if (relatedPerson == null) continue;
+
+                var dto = new PersonRelationDto
+                {
+                    PersonId = relatedPerson.Id ?? 0,
+                    Surname = relatedPerson.Surname,
+                    FirstName = relatedPerson.FirstName,
+                    Patronymic = relatedPerson.Patronymic,
+                    BirthDate = relatedPerson.BirthDate,
+                    DeathDate = relatedPerson.DeathDate,
+                    Photos = relatedPerson.Photos,
+                    RelationTitle = rel.RelationType?.Title,
+                };
+
+                var relName = rel.RelationType?.Name?.ToLower();
+                if (relName == "father")
+                {
+                    node.Father = new PersonTreeNode
+                    {
+                        Id = relatedPerson.Id ?? 0,
+                        Surname = relatedPerson.Surname,
+                        FirstName = relatedPerson.FirstName,
+                        Patronymic = relatedPerson.Patronymic,
+                        BirthDate = relatedPerson.BirthDate,
+                        DeathDate = relatedPerson.DeathDate,
+                        Photos = relatedPerson.Photos,
+                    };
+                }
+                else if (relName == "mother")
+                {
+                    node.Mother = new PersonTreeNode
+                    {
+                        Id = relatedPerson.Id ?? 0,
+                        Surname = relatedPerson.Surname,
+                        FirstName = relatedPerson.FirstName,
+                        Patronymic = relatedPerson.Patronymic,
+                        BirthDate = relatedPerson.BirthDate,
+                        DeathDate = relatedPerson.DeathDate,
+                        Photos = relatedPerson.Photos,
+                    };
+                }
+                else if (relName == "son" || relName == "daughter")
+                {
+                    node.Children.Add(dto);
+                }
+                else if (relName == "brother" || relName == "sister")
+                {
+                    node.Siblings.Add(dto);
+                }
+                else if (relName == "husband" || relName == "wife")
+                {
+                    node.Spouses.Add(dto);
+                }
+            }
+
+            return node;
         }
     }
 }

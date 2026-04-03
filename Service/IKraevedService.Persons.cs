@@ -18,5 +18,6 @@ namespace KraevedAPI.Service
         Task<IEnumerable<PersonRelationDto>> GetRelationsByPersonId(int personId);
         Task<bool> AddRelation(int personId1, int personId2, int relationTypeId);
         Task<bool> RemoveRelation(int personId1, int personId2, int relationTypeId);
+        Task<PersonTreeNode> GetFamilyTree(int personId);
     }
 }

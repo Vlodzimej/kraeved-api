@@ -111,6 +111,14 @@ namespace KraevedAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}/tree")]
+        [AllowAnonymous]
+        public async Task<ActionResult<PersonTreeNode>> GetFamilyTree(int id)
+        {
+            var result = await _kraevedService.GetFamilyTree(id);
+            return Ok(result);
+        }
+
         [HttpPost("relation")]
         public async Task<ActionResult> AddRelation([FromBody] RelationRequest request)
         {
