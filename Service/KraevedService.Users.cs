@@ -43,10 +43,10 @@ namespace KraevedAPI.Service
         }
 
         private User GetCurrentUser() {
-            var userId = _httpContextAccessor.HttpContext.User.Identity.Name
+            var userIdStr = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
                 ?? throw new HttpResponseException(401, new { message = ServiceConstants.Exception.UserNotFound });
                 
-            var user = _unitOfWork.UsersRepository.Get(x => x.Id == int.Parse(userId), includeProperties: "Role").FirstOrDefault() 
+            var user = _unitOfWork.UsersRepository.Get(x => x.Id == int.Parse(userIdStr), includeProperties: "Role").FirstOrDefault() 
                 ?? throw new HttpResponseException(401, new { message = ServiceConstants.Exception.UserNotFound });
 
             return user;
