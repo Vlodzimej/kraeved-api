@@ -26,13 +26,15 @@ namespace kraeved.Migrations
                 -- Сброс счётчиков автоинкремента
                 ALTER SEQUENCE ""GeoObjects_Id_seq"" RESTART WITH 1;
                 ALTER SEQUENCE ""Persons_Id_seq"" RESTART WITH 1;
-                ALTER SEQUENCE ""GeoObjectTypes_Id_seq"" RESTART WITH 101;
+                ALTER SEQUENCE ""GeoObjectType_Id_seq"" RESTART WITH 101;
                 ALTER SEQUENCE ""GeoObjectCategories_Id_seq"" RESTART WITH 1;
                 ALTER SEQUENCE ""HistoricalEvents_Id_seq"" RESTART WITH 1;
                 ALTER SEQUENCE ""ImageObjects_Id_seq"" RESTART WITH 1;
                 ALTER SEQUENCE ""Comments_Id_seq"" RESTART WITH 1;
                 ALTER SEQUENCE ""Users_Id_seq"" RESTART WITH 2;
                 ALTER SEQUENCE ""AppSettings_Id_seq"" RESTART WITH 1;
+                ALTER SEQUENCE ""SmsCodes_Id_seq"" RESTART WITH 1;
+                ALTER SEQUENCE ""PersonRelationTypes_Id_seq"" RESTART WITH 1;
             ");
         }
 
