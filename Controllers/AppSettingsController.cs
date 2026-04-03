@@ -7,7 +7,6 @@ namespace KraevedAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "ADMIN")]
     public class AppSettingsController : ControllerBase
     {
         private readonly IKraevedService _kraevedService;
@@ -34,6 +33,7 @@ namespace KraevedAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult> UpsertSetting([FromBody] SettingRequest request)
         {
             var result = await _kraevedService.UpsertSetting(request.Key, request.Value, request.Description);
