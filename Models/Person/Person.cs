@@ -43,9 +43,10 @@ namespace KraevedAPI.Models
         public DateOnly? DeathDate { get; set; }
 
         /// <summary>
-        /// Список фотографий (имена файлов)
+        /// Список фотографий
         /// </summary>
-        public List<string>? Photos { get; set; }
+        [JsonIgnore]
+        public List<ImageInfo>? PhotosInfo { get; set; }
 
         /// <summary>
         /// Связанные гео-объекты

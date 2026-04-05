@@ -9,7 +9,7 @@ namespace KraevedAPI.Service
         public async Task<IEnumerable<Person>> GetAllPersons()
         {
             return _unitOfWork.PersonsRepository.Get(
-                includeProperties: "PersonGeoObjects.GeoObject"
+                includeProperties: "PersonGeoObjects.GeoObject,PhotosInfo"
             );
         }
 
@@ -17,7 +17,7 @@ namespace KraevedAPI.Service
         {
             return _unitOfWork.PersonsRepository.Get(
                 filter: p => p.Id == id,
-                includeProperties: "PersonGeoObjects.GeoObject.Type"
+                includeProperties: "PersonGeoObjects.GeoObject.Type,PhotosInfo"
             ).FirstOrDefault();
         }
 
@@ -39,7 +39,7 @@ namespace KraevedAPI.Service
             existing.Biography = person.Biography;
             existing.BirthDate = person.BirthDate;
             existing.DeathDate = person.DeathDate;
-            existing.Photos = person.Photos;
+            existing.PhotosInfo = person.PhotosInfo;
 
             _unitOfWork.PersonsRepository.Update(existing);
             await _unitOfWork.SaveAsync();
@@ -66,7 +66,7 @@ namespace KraevedAPI.Service
         {
             return _unitOfWork.PersonGeoObjectsRepository.Get(
                 x => x.GeoObjectId == geoObjectId,
-                includeProperties: "Person"
+                includeProperties: "Person.PhotosInfo"
             )
             .Select(pg => pg.Person)
             .Where(p => p != null)
@@ -142,7 +142,7 @@ namespace KraevedAPI.Service
                         Patronymic = otherPerson.Patronymic,
                         BirthDate = otherPerson.BirthDate,
                         DeathDate = otherPerson.DeathDate,
-                        Photos = otherPerson.Photos,
+                        Photos = otherPerson.PhotosInfo?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
                         RelationTitle = rel.RelationType?.Title,
                     });
                 }
@@ -234,7 +234,7 @@ namespace KraevedAPI.Service
                 Patronymic = person?.Patronymic,
                 BirthDate = person?.BirthDate,
                 DeathDate = person?.DeathDate,
-                Photos = person?.Photos,
+                Photos = person?.PhotosInfo?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
                 Parents = new List<PersonTreeNode>(),
                 Spouses = new List<PersonRelationDto>(),
                 Children = new List<PersonRelationDto>(),
@@ -256,7 +256,7 @@ namespace KraevedAPI.Service
                     Patronymic = relatedPerson.Patronymic,
                     BirthDate = relatedPerson.BirthDate,
                     DeathDate = relatedPerson.DeathDate,
-                    Photos = relatedPerson.Photos,
+                    Photos = relatedPerson.PhotosInfo?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
                     RelationTitle = rel.RelationType?.Title,
                 };
 
@@ -271,7 +271,7 @@ namespace KraevedAPI.Service
                         Patronymic = relatedPerson.Patronymic,
                         BirthDate = relatedPerson.BirthDate,
                         DeathDate = relatedPerson.DeathDate,
-                        Photos = relatedPerson.Photos,
+                        Photos = relatedPerson.PhotosInfo?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
                     });
                 }
                 else if (relName == "child")

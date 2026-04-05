@@ -11,7 +11,7 @@ namespace KraevedAPI.Models
         public int? RegionId { get; set; }
         public int? TypeId { get; set; }
         public GeoObjectTypeBriefDto? Type { get; set; }
-        public List<string>? Images { get; set; }
+        public List<ImageInfoDto>? Images { get; set; }
         public string? Thumbnail { get; set; }
         public List<PersonBriefDto>? Persons { get; set; }
     }
@@ -24,7 +24,7 @@ namespace KraevedAPI.Models
         public string? Patronymic { get; set; }
         public DateOnly? BirthDate { get; set; }
         public DateOnly? DeathDate { get; set; }
-        public List<string>? Photos { get; set; }
+        public List<ImageInfoDto>? Photos { get; set; }
     }
 
     public class GeoObjectTypeBriefDto

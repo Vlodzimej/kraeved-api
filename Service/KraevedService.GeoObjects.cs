@@ -14,14 +14,14 @@ namespace KraevedAPI.Service
         {
             var filter = new GeoObjectFilter() { Id = id };
             var result = _unitOfWork.GeoObjectsRepository
-                .Get(x => filter.Id == null || x.Id == filter.Id, includeProperties: "Type,PersonGeoObjects.Person")
+                .Get(x => filter.Id == null || x.Id == filter.Id, includeProperties: "Type,PersonGeoObjects.Person,ImagesInfo")
                 ?? throw new Exception(ServiceConstants.Exception.UnknownError);
 
             var geoObject = result.FirstOrDefault();
 
-            if (geoObject != null && geoObject.Images == null)
+            if (geoObject != null && geoObject.ImagesInfo == null)
             {
-                geoObject.Images = new List<string>();
+                geoObject.ImagesInfo = new List<ImageInfo>();
             }
 
             return geoObject;
@@ -133,7 +133,7 @@ namespace KraevedAPI.Service
             existingGeoObject.RegionId = geoObject.RegionId;
             existingGeoObject.Type = type;
             existingGeoObject.Thumbnail = geoObject.Thumbnail;
-            existingGeoObject.Images = geoObject.Images;
+            existingGeoObject.ImagesInfo = geoObject.ImagesInfo;
 
             _unitOfWork.GeoObjectsRepository.Update(existingGeoObject);
             await _unitOfWork.SaveAsync();

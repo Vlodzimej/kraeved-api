@@ -8,7 +8,7 @@ namespace KraevedAPI.Models
         public string? Patronymic { get; set; }
         public DateOnly? BirthDate { get; set; }
         public DateOnly? DeathDate { get; set; }
-        public List<string>? Photos { get; set; }
+        public List<ImageInfoDto>? Photos { get; set; }
         public string? RelationTitle { get; set; }
     }
 }

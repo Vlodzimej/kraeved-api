@@ -23,6 +23,7 @@ namespace KraevedAPI.DAL
         public DbSet<PersonRelation> PersonRelations => Set<PersonRelation>();
         public DbSet<AppSetting> AppSettings => Set<AppSetting>();
         public DbSet<Comment> Comments => Set<Comment>();
+        public DbSet<ImageInfo> ImageInfos => Set<ImageInfo>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -64,6 +65,18 @@ namespace KraevedAPI.DAL
                 .WithMany()
                 .HasForeignKey(prt => prt.PairedTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ImageInfo>()
+                .HasOne(i => i.GeoObject)
+                .WithMany(g => g.ImagesInfo)
+                .HasForeignKey(i => i.GeoObjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ImageInfo>()
+                .HasOne(i => i.Person)
+                .WithMany(p => p.PhotosInfo)
+                .HasForeignKey(i => i.PersonId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
