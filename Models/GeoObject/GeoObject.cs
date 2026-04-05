@@ -51,8 +51,7 @@
         /// Список изображений
         /// </summary>
         /// <value></value>
-        [System.Text.Json.Serialization.JsonIgnore]
-        public List<ImageInfo>? ImagesInfo { get; set; }
+        public List<ImageInfo>? Images { get; set; }
 
         /// <summary>
         /// Миниатюрное изображение

@@ -68,13 +68,13 @@ namespace KraevedAPI.DAL
 
             modelBuilder.Entity<ImageInfo>()
                 .HasOne(i => i.GeoObject)
-                .WithMany(g => g.ImagesInfo)
+                .WithMany(g => g.Images)
                 .HasForeignKey(i => i.GeoObjectId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ImageInfo>()
                 .HasOne(i => i.Person)
-                .WithMany(p => p.PhotosInfo)
+                .WithMany(p => p.Photos)
                 .HasForeignKey(i => i.PersonId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

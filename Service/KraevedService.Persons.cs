@@ -9,7 +9,7 @@ namespace KraevedAPI.Service
         public async Task<IEnumerable<Person>> GetAllPersons()
         {
             return _unitOfWork.PersonsRepository.Get(
-                includeProperties: "PersonGeoObjects.GeoObject,PhotosInfo"
+                includeProperties: "PersonGeoObjects.GeoObject,Photos"
             );
         }
 
@@ -17,7 +17,7 @@ namespace KraevedAPI.Service
         {
             return _unitOfWork.PersonsRepository.Get(
                 filter: p => p.Id == id,
-                includeProperties: "PersonGeoObjects.GeoObject.Type,PhotosInfo"
+                includeProperties: "PersonGeoObjects.GeoObject.Type,Photos"
             ).FirstOrDefault();
         }
 
@@ -39,7 +39,7 @@ namespace KraevedAPI.Service
             existing.Biography = person.Biography;
             existing.BirthDate = person.BirthDate;
             existing.DeathDate = person.DeathDate;
-            existing.PhotosInfo = person.PhotosInfo;
+            existing.Photos = person.Photos;
 
             _unitOfWork.PersonsRepository.Update(existing);
             await _unitOfWork.SaveAsync();
@@ -66,7 +66,7 @@ namespace KraevedAPI.Service
         {
             return _unitOfWork.PersonGeoObjectsRepository.Get(
                 x => x.GeoObjectId == geoObjectId,
-                includeProperties: "Person.PhotosInfo"
+                includeProperties: "Person.Photos"
             )
             .Select(pg => pg.Person)
             .Where(p => p != null)
@@ -142,7 +142,7 @@ namespace KraevedAPI.Service
                         Patronymic = otherPerson.Patronymic,
                         BirthDate = otherPerson.BirthDate,
                         DeathDate = otherPerson.DeathDate,
-                        Photos = otherPerson.PhotosInfo?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                        Photos = otherPerson.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
                         RelationTitle = rel.RelationType?.Title,
                     });
                 }
@@ -234,7 +234,7 @@ namespace KraevedAPI.Service
                 Patronymic = person?.Patronymic,
                 BirthDate = person?.BirthDate,
                 DeathDate = person?.DeathDate,
-                Photos = person?.PhotosInfo?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                Photos = person?.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
                 Parents = new List<PersonTreeNode>(),
                 Spouses = new List<PersonRelationDto>(),
                 Children = new List<PersonRelationDto>(),
@@ -256,7 +256,7 @@ namespace KraevedAPI.Service
                     Patronymic = relatedPerson.Patronymic,
                     BirthDate = relatedPerson.BirthDate,
                     DeathDate = relatedPerson.DeathDate,
-                    Photos = relatedPerson.PhotosInfo?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                    Photos = relatedPerson.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
                     RelationTitle = rel.RelationType?.Title,
                 };
 
@@ -271,7 +271,7 @@ namespace KraevedAPI.Service
                         Patronymic = relatedPerson.Patronymic,
                         BirthDate = relatedPerson.BirthDate,
                         DeathDate = relatedPerson.DeathDate,
-                        Photos = relatedPerson.PhotosInfo?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                        Photos = relatedPerson.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
                     });
                 }
                 else if (relName == "child")

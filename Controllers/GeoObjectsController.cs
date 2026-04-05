@@ -153,7 +153,7 @@ namespace KraevedAPI.Controllers
                     Patronymic = p!.Patronymic,
                     BirthDate = p!.BirthDate,
                     DeathDate = p!.DeathDate,
-                    Photos = p!.PhotosInfo?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                    Photos = p!.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
                 });
                 return Ok(dtos);
             }

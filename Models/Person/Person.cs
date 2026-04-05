@@ -45,8 +45,7 @@ namespace KraevedAPI.Models
         /// <summary>
         /// Список фотографий
         /// </summary>
-        [JsonIgnore]
-        public List<ImageInfo>? PhotosInfo { get; set; }
+        public List<ImageInfo>? Photos { get; set; }
 
         /// <summary>
         /// Связанные гео-объекты
