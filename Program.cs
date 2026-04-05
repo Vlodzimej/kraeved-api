@@ -35,15 +35,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<HttpResponseExceptionFilter>();
-}).ConfigureApiBehaviorOptions(options =>
-{
-    options.SuppressModelStateInvalidFilter = false;
-});
-
-builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 104857600; // 100MB
-    options.ValueLengthLimit = 104857600;
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
