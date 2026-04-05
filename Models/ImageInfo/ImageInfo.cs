@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace KraevedAPI.Models
 {
@@ -13,9 +14,11 @@ namespace KraevedAPI.Models
         public string? Caption { get; set; }
 
         public int? GeoObjectId { get; set; }
+        [JsonIgnore]
         public GeoObject? GeoObject { get; set; }
 
         public int? PersonId { get; set; }
+        [JsonIgnore]
         public Person? Person { get; set; }
     }
 }
