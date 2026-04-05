@@ -42,12 +42,19 @@ namespace KraevedAPI.Models
         /// Список изображений
         /// </summary>
         /// <value></value>
-        public List<string>? Images { get; set; } 
+        public List<ImageInfoDto>? Images { get; set; } 
 
         /// <summary>
         /// Миниатюрное изображение
         /// </summary>
         /// <value></value>
         public string? Thumbnail { get; set; }
+    }
+
+    public class ImageInfoDto
+    {
+        public int? Id { get; set; }
+        public string Filename { get; set; } = string.Empty;
+        public string? Caption { get; set; }
     }
 }
