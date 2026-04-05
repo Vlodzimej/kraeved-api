@@ -40,10 +40,11 @@ namespace KraevedAPI.Service
             ).FirstOrDefault() ?? comment;
         }
 
-        public async Task<Comment?> DeleteComment(int commentId, int userId)
+        public async Task<Comment?> DeleteComment(int commentId, int userId, bool isAdmin = false)
         {
             var comment = _unitOfWork.CommentsRepository.GetByID(commentId);
-            if (comment == null || comment.UserId != userId) return null;
+            if (comment == null) return null;
+            if (!isAdmin && comment.UserId != userId) return null;
 
             _unitOfWork.CommentsRepository.Delete(comment);
             await _unitOfWork.SaveAsync();

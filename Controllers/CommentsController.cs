@@ -49,10 +49,12 @@ namespace KraevedAPI.Controllers
         public async Task<ActionResult> DeleteComment(int id)
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isAdmin = User.IsInRole("ADMIN");
+
             if (!int.TryParse(userIdStr, out var userId))
                 return Unauthorized();
 
-            var result = await _kraevedService.DeleteComment(id, userId);
+            var result = await _kraevedService.DeleteComment(id, userId, isAdmin);
             if (result == null) return NotFound();
             return Ok(result);
         }
