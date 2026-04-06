@@ -128,6 +128,62 @@ namespace KraevedAPI.Controllers
         }
 
         /// <summary>
+        /// Импортировать гео-объекты из JSON файла
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost("import")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult> ImportGeoObjectsFromJson(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Файл не выбран");
+            }
+
+            try
+            {
+                using var stream = file.OpenReadStream();
+                using var reader = new StreamReader(stream);
+                var json = await reader.ReadToEndAsync();
+
+                var geoObjects = System.Text.Json.JsonSerializer.Deserialize<List<GeoObject>>(json);
+
+                if (geoObjects == null || geoObjects.Count == 0)
+                {
+                    return BadRequest("Некорректный формат JSON файла");
+                }
+
+                var results = new List<GeoObject>();
+                var errors = new List<string>();
+
+                foreach (var geoObject in geoObjects)
+                {
+                    try
+                    {
+                        var result = await _kraevedService.InsertGeoObject(geoObject);
+                        results.Add(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add($"Ошибка при импорте '{geoObject.Name}': {ex.Message}");
+                    }
+                }
+
+                return Ok(new
+                {
+                    Imported = results.Count,
+                    Failed = errors.Count,
+                    Errors = errors.Count > 0 ? errors : null,
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Удалить гео-объект по идентификатору
         /// </summary>
         /// <param name="id"></param>
