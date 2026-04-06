@@ -65,6 +65,23 @@
         public string? CustomFields { get; set; }
 
         /// <summary>
+        /// Родительский гео-объект
+        /// </summary>
+        public int? ParentId { get; set; }
+
+        /// <summary>
+        /// Родительский гео-объект
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public GeoObject? Parent { get; set; }
+
+        /// <summary>
+        /// Дочерние гео-объекты
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public List<GeoObject>? Children { get; set; }
+
+        /// <summary>
         /// Связанные персоны
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
