@@ -60,6 +60,11 @@
         public string? Thumbnail { get; set; }
 
         /// <summary>
+        /// Пользовательские поля (JSON)
+        /// </summary>
+        public string? CustomFields { get; set; }
+
+        /// <summary>
         /// Связанные персоны
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
