@@ -80,6 +80,7 @@ namespace KraevedAPI.Service
                 Type = type,
                 Description = geoObject.Description,
                 ShortDescription = geoObject.ShortDescription,
+                CustomFields = geoObject.CustomFields,
             };
 
             _unitOfWork.GeoObjectsRepository.Insert(geoObject);
@@ -134,6 +135,7 @@ namespace KraevedAPI.Service
             existingGeoObject.Type = type;
             existingGeoObject.Thumbnail = geoObject.Thumbnail;
             existingGeoObject.Images = geoObject.Images;
+            existingGeoObject.CustomFields = geoObject.CustomFields;
 
             _unitOfWork.GeoObjectsRepository.Update(existingGeoObject);
             await _unitOfWork.SaveAsync();
