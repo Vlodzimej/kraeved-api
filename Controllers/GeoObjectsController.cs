@@ -29,6 +29,24 @@ namespace KraevedAPI.Controllers
             try
             {
                 result = await _kraevedService.GetGeoObjectById(id);
+
+                if (result != null && result.Children != null)
+                {
+                    result.Children = result.Children.Select(c => new GeoObject
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        TypeId = c.TypeId,
+                        Type = c.Type != null ? new GeoObjectType
+                        {
+                            Id = c.Type.Id,
+                            Name = c.Type.Name,
+                            Title = c.Type.Title,
+                        } : null,
+                        ShortDescription = c.ShortDescription,
+                        Thumbnail = c.Thumbnail,
+                    }).ToList();
+                }
             }
             catch (Exception ex)
             {

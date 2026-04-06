@@ -78,7 +78,6 @@
         /// <summary>
         /// Дочерние гео-объекты
         /// </summary>
-        [System.Text.Json.Serialization.JsonIgnore]
         public List<GeoObject>? Children { get; set; }
 
         /// <summary>
