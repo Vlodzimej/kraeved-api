@@ -60,6 +60,11 @@ namespace KraevedAPI.Service
 
             Validate(geoObject);
 
+            if (geoObject.ParentId != null)
+            {
+                ValidateParentId(geoObject.Id ?? 0, geoObject.ParentId);
+            }
+
             var filter = new GeoObjectFilter() { Name = geoObject.Name, RegionId = geoObject.RegionId };
             var existedGeoObjectList = await GetGeoObjectsByFilter(filter);
             if (existedGeoObjectList.FirstOrDefault() != null)
@@ -125,6 +130,11 @@ namespace KraevedAPI.Service
                 throw new Exception(ServiceConstants.Exception.NotFound);
             Validate(existingGeoObject);
 
+            if (geoObject.ParentId != existingGeoObject.ParentId)
+            {
+                ValidateParentId(geoObject.Id ?? 0, geoObject.ParentId);
+            }
+
             var type = _unitOfWork.GeoObjectTypesRepository.Get(x => geoObject.TypeId == x.Id).FirstOrDefault();
 
             existingGeoObject.Name = geoObject.Name;
@@ -176,6 +186,61 @@ namespace KraevedAPI.Service
             {
                 throw new Exception(string.Join("\n", errorMessages));
             }
+        }
+
+        /// <summary>
+        /// Валидация родительского объекта (защита от циклических ссылок)
+        /// </summary>
+        private void ValidateParentId(int geoObjectId, int? parentId)
+        {
+            if (parentId == null) return;
+
+            if (parentId == geoObjectId)
+            {
+                throw new Exception("Объект не может быть родителем самого себя");
+            }
+
+            var allObjects = _unitOfWork.GeoObjectsRepository
+                .Get(x => true, includeProperties: "Parent,Children")
+                .ToList();
+
+            var isDescendant = IsDescendant(allObjects, parentId.Value, geoObjectId);
+            if (isDescendant)
+            {
+                throw new Exception("Нельзя назначить родительским объект, который уже является дочерним");
+            }
+
+            var isAncestor = IsAncestor(allObjects, parentId.Value, geoObjectId);
+            if (isAncestor)
+            {
+                throw new Exception("Нельзя назначить дочерним объект, который уже является родительским");
+            }
+        }
+
+        private bool IsDescendant(List<GeoObject> allObjects, int candidateParentId, int geoObjectId)
+        {
+            var visited = new HashSet<int>();
+            var current = candidateParentId;
+
+            while (true)
+            {
+                if (visited.Contains(current)) break;
+                visited.Add(current);
+
+                if (current == geoObjectId) return true;
+
+                var obj = allObjects.FirstOrDefault(x => x.Id == current);
+                if (obj?.ParentId == null) break;
+                current = obj.ParentId.Value;
+            }
+
+            return false;
+        }
+
+        private bool IsAncestor(List<GeoObject> allObjects, int candidateParentId, int geoObjectId)
+        {
+            var obj = allObjects.FirstOrDefault(x => x.Id == candidateParentId);
+            return obj?.Children?.Any(c => c.Id == geoObjectId) == true;
         }
     }
 }
