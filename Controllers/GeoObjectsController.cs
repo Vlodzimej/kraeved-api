@@ -30,22 +30,43 @@ namespace KraevedAPI.Controllers
             {
                 result = await _kraevedService.GetGeoObjectById(id);
 
-                if (result != null && result.Children != null)
+                if (result != null)
                 {
-                    result.Children = result.Children.Select(c => new GeoObject
+                    if (result.Parent != null)
                     {
-                        Id = c.Id,
-                        Name = c.Name,
-                        TypeId = c.TypeId,
-                        Type = c.Type != null ? new GeoObjectType
+                        result.Parent = new GeoObject
                         {
-                            Id = c.Type.Id,
-                            Name = c.Type.Name,
-                            Title = c.Type.Title,
-                        } : null,
-                        ShortDescription = c.ShortDescription,
-                        Thumbnail = c.Thumbnail,
-                    }).ToList();
+                            Id = result.Parent.Id,
+                            Name = result.Parent.Name,
+                            TypeId = result.Parent.TypeId,
+                            Type = result.Parent.Type != null ? new GeoObjectType
+                            {
+                                Id = result.Parent.Type.Id,
+                                Name = result.Parent.Type.Name,
+                                Title = result.Parent.Type.Title,
+                            } : null,
+                            ShortDescription = result.Parent.ShortDescription,
+                            Thumbnail = result.Parent.Thumbnail,
+                        };
+                    }
+
+                    if (result.Children != null)
+                    {
+                        result.Children = result.Children.Select(c => new GeoObject
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            TypeId = c.TypeId,
+                            Type = c.Type != null ? new GeoObjectType
+                            {
+                                Id = c.Type.Id,
+                                Name = c.Type.Name,
+                                Title = c.Type.Title,
+                            } : null,
+                            ShortDescription = c.ShortDescription,
+                            Thumbnail = c.Thumbnail,
+                        }).ToList();
+                    }
                 }
             }
             catch (Exception ex)
