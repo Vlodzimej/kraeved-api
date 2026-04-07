@@ -32,6 +32,23 @@ namespace KraevedAPI.Controllers
 
                 if (result != null)
                 {
+                    if (result.Subtype != null)
+                    {
+                        result.Subtype = new GeoObjectType
+                        {
+                            Id = result.Subtype.Id,
+                            Name = result.Subtype.Name,
+                            Title = result.Subtype.Title,
+                            CategoryId = result.Subtype.CategoryId,
+                            Category = result.Subtype.Category != null ? new GeoObjectCategory
+                            {
+                                Id = result.Subtype.Category.Id,
+                                Name = result.Subtype.Category.Name,
+                                Title = result.Subtype.Category.Title,
+                            } : null,
+                        };
+                    }
+
                     if (result.Parent != null)
                     {
                         result.Parent = new GeoObject

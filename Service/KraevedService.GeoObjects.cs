@@ -14,7 +14,7 @@ namespace KraevedAPI.Service
         {
             var filter = new GeoObjectFilter() { Id = id };
             var result = _unitOfWork.GeoObjectsRepository
-                .Get(x => filter.Id == null || x.Id == filter.Id, includeProperties: "Type,Type.Category,Parent,Parent.Type,Children.Type,PersonGeoObjects.Person,Images")
+                .Get(x => filter.Id == null || x.Id == filter.Id, includeProperties: "Type,Type.Category,Subtype,Subtype.Category,Parent,Parent.Type,Children.Type,PersonGeoObjects.Person,Images")
                 ?? throw new Exception(ServiceConstants.Exception.UnknownError);
 
             var geoObject = result.FirstOrDefault();
@@ -79,10 +79,17 @@ namespace KraevedAPI.Service
                 throw new Exception(ServiceConstants.Exception.GeoObjectTypeNotFound);
             }
 
+            GeoObjectType? subtype = null;
+            if (geoObject.SubtypeId != null)
+            {
+                subtype = _unitOfWork.GeoObjectTypesRepository.GetByID(geoObject.SubtypeId);
+            }
+
             var newGeoObject = new GeoObject()
             {
                 Name = geoObject.Name,
                 Type = type,
+                Subtype = subtype,
                 Description = geoObject.Description,
                 ShortDescription = geoObject.ShortDescription,
                 CustomFields = geoObject.CustomFields,
@@ -137,6 +144,12 @@ namespace KraevedAPI.Service
 
             var type = _unitOfWork.GeoObjectTypesRepository.Get(x => geoObject.TypeId == x.Id).FirstOrDefault();
 
+            GeoObjectType? subtype = null;
+            if (geoObject.SubtypeId != null)
+            {
+                subtype = _unitOfWork.GeoObjectTypesRepository.Get(x => geoObject.SubtypeId == x.Id).FirstOrDefault();
+            }
+
             existingGeoObject.Name = geoObject.Name;
             existingGeoObject.ShortDescription = geoObject.ShortDescription;
             existingGeoObject.Description = geoObject.Description;
@@ -144,6 +157,7 @@ namespace KraevedAPI.Service
             existingGeoObject.Latitude = geoObject.Latitude;
             existingGeoObject.RegionId = geoObject.RegionId;
             existingGeoObject.Type = type;
+            existingGeoObject.Subtype = subtype;
             existingGeoObject.Thumbnail = geoObject.Thumbnail;
             existingGeoObject.Images = geoObject.Images;
             existingGeoObject.CustomFields = geoObject.CustomFields;

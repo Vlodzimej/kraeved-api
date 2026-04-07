@@ -23,6 +23,12 @@
         public int? TypeId { get; set; }
 
         /// <summary>
+        /// Подтип локации
+        /// </summary>
+        public GeoObjectType? Subtype { get; set; }
+        public int? SubtypeId { get; set; }
+
+        /// <summary>
         /// Описание
         /// </summary>
         public string Description { get; set; } = string.Empty;

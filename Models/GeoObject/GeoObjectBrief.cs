@@ -41,6 +41,21 @@ namespace KraevedAPI.Models
         public string? TypeCategoryName { get; set; }
 
         /// <summary>
+        /// Идентификатор подтипа
+        /// </summary>
+        public int? SubtypeId { get; set; }
+
+        /// <summary>
+        /// Системное имя подтипа
+        /// </summary>
+        public string? SubtypeName { get; set; }
+
+        /// <summary>
+        /// Отображаемое название подтипа
+        /// </summary>
+        public string? SubtypeTitle { get; set; }
+
+        /// <summary>
         /// Широта
         /// </summary> 
         public double? Latitude { get; set; }
