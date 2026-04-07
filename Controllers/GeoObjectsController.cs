@@ -134,7 +134,7 @@ namespace KraevedAPI.Controllers
         /// <returns></returns>
         [HttpPost("import")]
         [Authorize(Roles = "ADMIN")]
-        public async Task<ActionResult> ImportGeoObjectsFromJson(IFormFile file)
+        public async Task<ActionResult> ImportGeoObjectsFromJson([FromForm] IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
