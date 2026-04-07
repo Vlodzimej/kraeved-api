@@ -7,7 +7,7 @@ namespace KraevedAPI.Service
     {
         Task<GeoObject?> GetGeoObjectById(int id);
         Task<IEnumerable<GeoObjectBrief>> GetGeoObjectsByFilter(GeoObjectFilter filter);
-        Task<GeoObject> InsertGeoObject(GeoObject geoObject);
+        Task<GeoObject> InsertGeoObject(GeoObject geoObject, bool skipExistenceCheck = false);
         Task<GeoObject> DeleteGeoObject(int id);
         Task<GeoObject> UpdateGeoObject(GeoObject geoObject);
     }

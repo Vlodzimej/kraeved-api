@@ -33,6 +33,24 @@ namespace KraevedAPI.Helpers
                     item => item.Type != null && item.Type.Category != null ? item.Type.Category.Name : null
                 )
             )
+            .ForMember(
+                dest => dest.SubtypeId,
+                src => src.MapFrom(
+                    item => item.Subtype != null ? item.Subtype.Id : null
+                )
+            )
+            .ForMember(
+                dest => dest.SubtypeName,
+                src => src.MapFrom(
+                    item => item.Subtype != null ? item.Subtype.Name : null
+                )
+            )
+            .ForMember(
+                dest => dest.SubtypeTitle,
+                src => src.MapFrom(
+                    item => item.Subtype != null ? item.Subtype.Title : null
+                )
+            )
             .ForMember( 
                 dest => dest.ShortDescription,
                 src => src.MapFrom(

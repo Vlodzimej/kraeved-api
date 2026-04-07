@@ -23,6 +23,12 @@
         public int? TypeId { get; set; }
 
         /// <summary>
+        /// Подтип локации
+        /// </summary>
+        public GeoObjectType? Subtype { get; set; }
+        public int? SubtypeId { get; set; }
+
+        /// <summary>
         /// Описание
         /// </summary>
         public string Description { get; set; } = string.Empty;
@@ -63,6 +69,22 @@
         /// Пользовательские поля (JSON)
         /// </summary>
         public string? CustomFields { get; set; }
+
+        /// <summary>
+        /// Родительский гео-объект
+        /// </summary>
+        public int? ParentId { get; set; }
+
+        /// <summary>
+        /// Родительский гео-объект
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public GeoObject? Parent { get; set; }
+
+        /// <summary>
+        /// Дочерние гео-объекты
+        /// </summary>
+        public List<GeoObject>? Children { get; set; }
 
         /// <summary>
         /// Связанные персоны

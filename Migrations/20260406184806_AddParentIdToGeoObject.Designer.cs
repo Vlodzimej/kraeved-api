@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using KraevedAPI.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace kraeved.Migrations
 {
     [DbContext(typeof(KraevedContext))]
-    partial class KraevedContextModelSnapshot : ModelSnapshot
+    [Migration("20260406184806_AddParentIdToGeoObject")]
+    partial class AddParentIdToGeoObject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,9 +115,6 @@ namespace kraeved.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("SubtypeId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Thumbnail")
                         .HasColumnType("text");
 
@@ -124,8 +124,6 @@ namespace kraeved.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
-
-                    b.HasIndex("SubtypeId");
 
                     b.HasIndex("TypeId");
 
@@ -478,18 +476,11 @@ namespace kraeved.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("KraevedAPI.Models.GeoObjectType", "Subtype")
-                        .WithMany()
-                        .HasForeignKey("SubtypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("KraevedAPI.Models.GeoObjectType", "Type")
                         .WithMany()
                         .HasForeignKey("TypeId");
 
                     b.Navigation("Parent");
-
-                    b.Navigation("Subtype");
 
                     b.Navigation("Type");
                 });

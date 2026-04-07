@@ -29,6 +29,62 @@ namespace KraevedAPI.Controllers
             try
             {
                 result = await _kraevedService.GetGeoObjectById(id);
+
+                if (result != null)
+                {
+                    if (result.Subtype != null)
+                    {
+                        result.Subtype = new GeoObjectType
+                        {
+                            Id = result.Subtype.Id,
+                            Name = result.Subtype.Name,
+                            Title = result.Subtype.Title,
+                            CategoryId = result.Subtype.CategoryId,
+                            Category = result.Subtype.Category != null ? new GeoObjectCategory
+                            {
+                                Id = result.Subtype.Category.Id,
+                                Name = result.Subtype.Category.Name,
+                                Title = result.Subtype.Category.Title,
+                            } : null,
+                        };
+                    }
+
+                    if (result.Parent != null)
+                    {
+                        result.Parent = new GeoObject
+                        {
+                            Id = result.Parent.Id,
+                            Name = result.Parent.Name,
+                            TypeId = result.Parent.TypeId,
+                            Type = result.Parent.Type != null ? new GeoObjectType
+                            {
+                                Id = result.Parent.Type.Id,
+                                Name = result.Parent.Type.Name,
+                                Title = result.Parent.Type.Title,
+                            } : null,
+                            ShortDescription = result.Parent.ShortDescription,
+                            Thumbnail = result.Parent.Thumbnail,
+                        };
+                    }
+
+                    if (result.Children != null)
+                    {
+                        result.Children = result.Children.Select(c => new GeoObject
+                        {
+                            Id = c.Id,
+                            Name = c.Name,
+                            TypeId = c.TypeId,
+                            Type = c.Type != null ? new GeoObjectType
+                            {
+                                Id = c.Type.Id,
+                                Name = c.Type.Name,
+                                Title = c.Type.Title,
+                            } : null,
+                            ShortDescription = c.ShortDescription,
+                            Thumbnail = c.Thumbnail,
+                        }).ToList();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -86,6 +142,107 @@ namespace KraevedAPI.Controllers
             }
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Импортировать гео-объекты из JSON файла
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost("import")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult> ImportGeoObjectsFromJson([FromForm] IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new { error = "Файл не выбран или пуст" });
+            }
+
+            if (!file.FileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { error = "Файл должен иметь расширение .json" });
+            }
+
+            try
+            {
+                using var stream = file.OpenReadStream();
+                using var reader = new StreamReader(stream);
+                var json = await reader.ReadToEndAsync();
+
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+                };
+
+                List<GeoObject>? geoObjects = null;
+
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    geoObjects = System.Text.Json.JsonSerializer.Deserialize<List<GeoObject>>(json, options);
+                }
+                else if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object)
+                {
+                    var single = System.Text.Json.JsonSerializer.Deserialize<GeoObject>(json, options);
+                    if (single != null)
+                    {
+                        geoObjects = new List<GeoObject> { single };
+                    }
+                }
+
+                if (geoObjects == null || geoObjects.Count == 0)
+                {
+                    return BadRequest(new { error = "JSON файл пуст или имеет неверный формат. Ожидается массив объектов." });
+                }
+
+                var results = new List<GeoObject>();
+                var errors = new List<string>();
+
+                foreach (var geoObject in geoObjects)
+                {
+                    try
+                    {
+                        List<GeoObject>? children = geoObject.Children;
+                        geoObject.Children = null;
+
+                        var result = await _kraevedService.InsertGeoObject(geoObject, skipExistenceCheck: true);
+                        results.Add(result);
+
+                        if (children != null && children.Count > 0)
+                        {
+                            foreach (var child in children)
+                            {
+                                try
+                                {
+                                    child.ParentId = result.Id;
+                                    var childResult = await _kraevedService.InsertGeoObject(child, skipExistenceCheck: true);
+                                    results.Add(childResult);
+                                }
+                                catch (Exception ex)
+                                {
+                                    errors.Add($"Ошибка при импорте дочернего объекта '{child.Name}': {ex.Message}");
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add($"Ошибка при импорте '{geoObject.Name}': {ex.Message}");
+                    }
+                }
+
+                return Ok(new
+                {
+                    Imported = results.Count,
+                    Failed = errors.Count,
+                    Errors = errors.Count > 0 ? errors : null,
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = $"Ошибка обработки файла: {ex.Message}" });
+            }
         }
 
         /// <summary>

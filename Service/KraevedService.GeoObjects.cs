@@ -14,7 +14,7 @@ namespace KraevedAPI.Service
         {
             var filter = new GeoObjectFilter() { Id = id };
             var result = _unitOfWork.GeoObjectsRepository
-                .Get(x => filter.Id == null || x.Id == filter.Id, includeProperties: "Type,Type.Category,PersonGeoObjects.Person,Images")
+                .Get(x => filter.Id == null || x.Id == filter.Id, includeProperties: "Type,Type.Category,Subtype,Subtype.Category,Parent,Parent.Type,Children.Type,PersonGeoObjects.Person,Images")
                 ?? throw new Exception(ServiceConstants.Exception.UnknownError);
 
             var geoObject = result.FirstOrDefault();
@@ -39,7 +39,7 @@ namespace KraevedAPI.Service
                 .Get(x =>
                     (filter.Name == null || x.Name.ToLower().Contains(filter.Name.ToLower())) &&
                     (filter.RegionId == null || (filter.RegionId == x.RegionId)),
-                    x => x.OrderBy(item => item.Name), includeProperties: "Type,Type.Category")
+                    x => x.OrderBy(item => item.Name), includeProperties: "Type,Type.Category,Subtype")
                 .Select(_mapper.Map<GeoObjectBrief>) ??
                     throw new Exception(ServiceConstants.Exception.UnknownError);
 
@@ -51,7 +51,7 @@ namespace KraevedAPI.Service
         /// </summary>
         /// <param name="geoObject"></param>
         /// <returns></returns>
-        public async Task<GeoObject> InsertGeoObject(GeoObject geoObject)
+        public async Task<GeoObject> InsertGeoObject(GeoObject geoObject, bool skipExistenceCheck = false)
         {
             if (geoObject.TypeId == null)
             {
@@ -60,11 +60,19 @@ namespace KraevedAPI.Service
 
             Validate(geoObject);
 
-            var filter = new GeoObjectFilter() { Name = geoObject.Name, RegionId = geoObject.RegionId };
-            var existedGeoObjectList = await GetGeoObjectsByFilter(filter);
-            if (existedGeoObjectList.FirstOrDefault() != null)
+            if (!skipExistenceCheck)
             {
-                throw new Exception(ServiceConstants.Exception.ObjectExists);
+                var filter = new GeoObjectFilter() { Name = geoObject.Name, RegionId = geoObject.RegionId };
+                var existedGeoObjectList = await GetGeoObjectsByFilter(filter);
+                if (existedGeoObjectList.FirstOrDefault() != null)
+                {
+                    throw new Exception(ServiceConstants.Exception.ObjectExists);
+                }
+            }
+
+            if (geoObject.ParentId != null)
+            {
+                ValidateParentId(geoObject.Id ?? 0, geoObject.ParentId);
             }
 
             var type = _unitOfWork.GeoObjectTypesRepository.GetByID(geoObject.TypeId);
@@ -74,13 +82,21 @@ namespace KraevedAPI.Service
                 throw new Exception(ServiceConstants.Exception.GeoObjectTypeNotFound);
             }
 
+            GeoObjectType? subtype = null;
+            if (geoObject.SubtypeId != null)
+            {
+                subtype = _unitOfWork.GeoObjectTypesRepository.GetByID(geoObject.SubtypeId);
+            }
+
             var newGeoObject = new GeoObject()
             {
                 Name = geoObject.Name,
                 Type = type,
+                Subtype = subtype,
                 Description = geoObject.Description,
                 ShortDescription = geoObject.ShortDescription,
                 CustomFields = geoObject.CustomFields,
+                ParentId = geoObject.ParentId,
             };
 
             _unitOfWork.GeoObjectsRepository.Insert(geoObject);
@@ -124,7 +140,18 @@ namespace KraevedAPI.Service
                 throw new Exception(ServiceConstants.Exception.NotFound);
             Validate(existingGeoObject);
 
+            if (geoObject.ParentId != existingGeoObject.ParentId)
+            {
+                ValidateParentId(geoObject.Id ?? 0, geoObject.ParentId);
+            }
+
             var type = _unitOfWork.GeoObjectTypesRepository.Get(x => geoObject.TypeId == x.Id).FirstOrDefault();
+
+            GeoObjectType? subtype = null;
+            if (geoObject.SubtypeId != null)
+            {
+                subtype = _unitOfWork.GeoObjectTypesRepository.Get(x => geoObject.SubtypeId == x.Id).FirstOrDefault();
+            }
 
             existingGeoObject.Name = geoObject.Name;
             existingGeoObject.ShortDescription = geoObject.ShortDescription;
@@ -133,9 +160,11 @@ namespace KraevedAPI.Service
             existingGeoObject.Latitude = geoObject.Latitude;
             existingGeoObject.RegionId = geoObject.RegionId;
             existingGeoObject.Type = type;
+            existingGeoObject.Subtype = subtype;
             existingGeoObject.Thumbnail = geoObject.Thumbnail;
             existingGeoObject.Images = geoObject.Images;
             existingGeoObject.CustomFields = geoObject.CustomFields;
+            existingGeoObject.ParentId = geoObject.ParentId;
 
             _unitOfWork.GeoObjectsRepository.Update(existingGeoObject);
             await _unitOfWork.SaveAsync();
@@ -174,6 +203,61 @@ namespace KraevedAPI.Service
             {
                 throw new Exception(string.Join("\n", errorMessages));
             }
+        }
+
+        /// <summary>
+        /// Валидация родительского объекта (защита от циклических ссылок)
+        /// </summary>
+        private void ValidateParentId(int geoObjectId, int? parentId)
+        {
+            if (parentId == null) return;
+
+            if (parentId == geoObjectId)
+            {
+                throw new Exception("Объект не может быть родителем самого себя");
+            }
+
+            var allObjects = _unitOfWork.GeoObjectsRepository
+                .Get(x => true, includeProperties: "Parent,Children")
+                .ToList();
+
+            var isDescendant = IsDescendant(allObjects, parentId.Value, geoObjectId);
+            if (isDescendant)
+            {
+                throw new Exception("Нельзя назначить родительским объект, который уже является дочерним");
+            }
+
+            var isAncestor = IsAncestor(allObjects, parentId.Value, geoObjectId);
+            if (isAncestor)
+            {
+                throw new Exception("Нельзя назначить дочерним объект, который уже является родительским");
+            }
+        }
+
+        private bool IsDescendant(List<GeoObject> allObjects, int candidateParentId, int geoObjectId)
+        {
+            var visited = new HashSet<int>();
+            var current = candidateParentId;
+
+            while (true)
+            {
+                if (visited.Contains(current)) break;
+                visited.Add(current);
+
+                if (current == geoObjectId) return true;
+
+                var obj = allObjects.FirstOrDefault(x => x.Id == current);
+                if (obj?.ParentId == null) break;
+                current = obj.ParentId.Value;
+            }
+
+            return false;
+        }
+
+        private bool IsAncestor(List<GeoObject> allObjects, int candidateParentId, int geoObjectId)
+        {
+            var obj = allObjects.FirstOrDefault(x => x.Id == candidateParentId);
+            return obj?.Children?.Any(c => c.Id == geoObjectId) == true;
         }
     }
 }

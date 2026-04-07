@@ -77,6 +77,18 @@ namespace KraevedAPI.DAL
                 .WithMany(p => p.Photos)
                 .HasForeignKey(i => i.PersonId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GeoObject>()
+                .HasOne(g => g.Parent)
+                .WithMany(g => g.Children)
+                .HasForeignKey(g => g.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<GeoObject>()
+                .HasOne(g => g.Subtype)
+                .WithMany()
+                .HasForeignKey(g => g.SubtypeId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
