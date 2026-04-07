@@ -158,7 +158,21 @@ namespace KraevedAPI.Controllers
                     PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
                 };
 
-                var geoObjects = System.Text.Json.JsonSerializer.Deserialize<List<GeoObject>>(json, options);
+                List<GeoObject>? geoObjects = null;
+
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    geoObjects = System.Text.Json.JsonSerializer.Deserialize<List<GeoObject>>(json, options);
+                }
+                else if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object)
+                {
+                    var single = System.Text.Json.JsonSerializer.Deserialize<GeoObject>(json, options);
+                    if (single != null)
+                    {
+                        geoObjects = new List<GeoObject> { single };
+                    }
+                }
 
                 if (geoObjects == null || geoObjects.Count == 0)
                 {
