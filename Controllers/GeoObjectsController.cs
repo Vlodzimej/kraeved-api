@@ -138,7 +138,12 @@ namespace KraevedAPI.Controllers
         {
             if (file == null || file.Length == 0)
             {
-                return BadRequest("Файл не выбран");
+                return BadRequest(new { error = "Файл не выбран или пуст" });
+            }
+
+            if (!file.FileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { error = "Файл должен иметь расширение .json" });
             }
 
             try
@@ -147,11 +152,17 @@ namespace KraevedAPI.Controllers
                 using var reader = new StreamReader(stream);
                 var json = await reader.ReadToEndAsync();
 
-                var geoObjects = System.Text.Json.JsonSerializer.Deserialize<List<GeoObject>>(json);
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+                };
+
+                var geoObjects = System.Text.Json.JsonSerializer.Deserialize<List<GeoObject>>(json, options);
 
                 if (geoObjects == null || geoObjects.Count == 0)
                 {
-                    return BadRequest("Некорректный формат JSON файла");
+                    return BadRequest(new { error = "JSON файл пуст или имеет неверный формат. Ожидается массив объектов." });
                 }
 
                 var results = new List<GeoObject>();
@@ -179,7 +190,7 @@ namespace KraevedAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { ex.Message });
+                return BadRequest(new { error = $"Ошибка обработки файла: {ex.Message}" });
             }
         }
 
