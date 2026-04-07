@@ -39,7 +39,7 @@ namespace KraevedAPI.Service
                 .Get(x =>
                     (filter.Name == null || x.Name.ToLower().Contains(filter.Name.ToLower())) &&
                     (filter.RegionId == null || (filter.RegionId == x.RegionId)),
-                    x => x.OrderBy(item => item.Name), includeProperties: "Type,Type.Category")
+                    x => x.OrderBy(item => item.Name), includeProperties: "Type,Type.Category,Subtype")
                 .Select(_mapper.Map<GeoObjectBrief>) ??
                     throw new Exception(ServiceConstants.Exception.UnknownError);
 
