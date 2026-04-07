@@ -51,7 +51,7 @@ namespace KraevedAPI.Service
         /// </summary>
         /// <param name="geoObject"></param>
         /// <returns></returns>
-        public async Task<GeoObject> InsertGeoObject(GeoObject geoObject)
+        public async Task<GeoObject> InsertGeoObject(GeoObject geoObject, bool skipExistenceCheck = false)
         {
             if (geoObject.TypeId == null)
             {
@@ -60,16 +60,19 @@ namespace KraevedAPI.Service
 
             Validate(geoObject);
 
+            if (!skipExistenceCheck)
+            {
+                var filter = new GeoObjectFilter() { Name = geoObject.Name, RegionId = geoObject.RegionId };
+                var existedGeoObjectList = await GetGeoObjectsByFilter(filter);
+                if (existedGeoObjectList.FirstOrDefault() != null)
+                {
+                    throw new Exception(ServiceConstants.Exception.ObjectExists);
+                }
+            }
+
             if (geoObject.ParentId != null)
             {
                 ValidateParentId(geoObject.Id ?? 0, geoObject.ParentId);
-            }
-
-            var filter = new GeoObjectFilter() { Name = geoObject.Name, RegionId = geoObject.RegionId };
-            var existedGeoObjectList = await GetGeoObjectsByFilter(filter);
-            if (existedGeoObjectList.FirstOrDefault() != null)
-            {
-                throw new Exception(ServiceConstants.Exception.ObjectExists);
             }
 
             var type = _unitOfWork.GeoObjectTypesRepository.GetByID(geoObject.TypeId);

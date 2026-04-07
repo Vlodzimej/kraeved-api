@@ -206,7 +206,7 @@ namespace KraevedAPI.Controllers
                         List<GeoObject>? children = geoObject.Children;
                         geoObject.Children = null;
 
-                        var result = await _kraevedService.InsertGeoObject(geoObject);
+                        var result = await _kraevedService.InsertGeoObject(geoObject, skipExistenceCheck: true);
                         results.Add(result);
 
                         if (children != null && children.Count > 0)
@@ -216,7 +216,7 @@ namespace KraevedAPI.Controllers
                                 try
                                 {
                                     child.ParentId = result.Id;
-                                    var childResult = await _kraevedService.InsertGeoObject(child);
+                                    var childResult = await _kraevedService.InsertGeoObject(child, skipExistenceCheck: true);
                                     results.Add(childResult);
                                 }
                                 catch (Exception ex)
