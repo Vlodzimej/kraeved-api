@@ -186,8 +186,28 @@ namespace KraevedAPI.Controllers
                 {
                     try
                     {
+                        List<GeoObject>? children = geoObject.Children;
+                        geoObject.Children = null;
+
                         var result = await _kraevedService.InsertGeoObject(geoObject);
                         results.Add(result);
+
+                        if (children != null && children.Count > 0)
+                        {
+                            foreach (var child in children)
+                            {
+                                try
+                                {
+                                    child.ParentId = result.Id;
+                                    var childResult = await _kraevedService.InsertGeoObject(child);
+                                    results.Add(childResult);
+                                }
+                                catch (Exception ex)
+                                {
+                                    errors.Add($"Ошибка при импорте дочернего объекта '{child.Name}': {ex.Message}");
+                                }
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
