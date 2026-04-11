@@ -6,5 +6,6 @@ namespace KraevedAPI.Service
     public partial interface IKraevedService
     {
         Task<List<string>> UploadImages(IEnumerable<IFormFile> imageFiles);
+        void DeleteImageFiles(string filename);
     }
 }

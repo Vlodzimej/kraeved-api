@@ -120,11 +120,18 @@ namespace KraevedAPI.Service
         /// <returns></returns>
         public async Task<GeoObject> DeleteGeoObject(int id)
         {
-            var geoObject = _unitOfWork.GeoObjectsRepository.Get(x => id == x.Id).FirstOrDefault() ??
+            var geoObject = _unitOfWork.GeoObjectsRepository.Get(x => id == x.Id, includeProperties: "Images").FirstOrDefault() ??
                 throw new Exception(ServiceConstants.Exception.NotFound);
+
+            var imagesToDelete = geoObject.Images?.Select(i => i.Filename).ToList() ?? [];
 
             _unitOfWork.GeoObjectsRepository.Delete(id);
             await _unitOfWork.SaveAsync();
+
+            foreach (var filename in imagesToDelete)
+            {
+                DeleteImageFiles(filename);
+            }
 
             return geoObject;
         }
@@ -153,6 +160,10 @@ namespace KraevedAPI.Service
                 subtype = _unitOfWork.GeoObjectTypesRepository.Get(x => geoObject.SubtypeId == x.Id).FirstOrDefault();
             }
 
+            var existingFilenames = existingGeoObject.Images?.Select(i => i.Filename).ToHashSet() ?? [];
+            var newFilenames = geoObject.Images?.Select(i => i.Filename).ToHashSet() ?? [];
+            var removedFilenames = existingFilenames.Except(newFilenames).ToList();
+
             existingGeoObject.Name = geoObject.Name;
             existingGeoObject.ShortDescription = geoObject.ShortDescription;
             existingGeoObject.Description = geoObject.Description;
@@ -168,6 +179,11 @@ namespace KraevedAPI.Service
 
             _unitOfWork.GeoObjectsRepository.Update(existingGeoObject);
             await _unitOfWork.SaveAsync();
+
+            foreach (var filename in removedFilenames)
+            {
+                DeleteImageFiles(filename);
+            }
 
             return existingGeoObject;
         }

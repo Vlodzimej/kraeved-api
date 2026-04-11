@@ -126,5 +126,32 @@ namespace KraevedAPI.Service
                 await image.SaveAsJpegAsync(path, new JpegEncoder { Quality = 85 }, token);
             }
         }
+
+        public void DeleteImageFiles(string filename)
+        {
+            var rootFolder = Directory.GetCurrentDirectory();
+            
+            var originalPath = Path.Combine(rootFolder, "images", filename);
+            if (File.Exists(originalPath))
+            {
+                File.Delete(originalPath);
+            }
+
+            var ext = Path.GetExtension(filename);
+            var thumbExt = ext.Equals(".png", StringComparison.OrdinalIgnoreCase) ? ".png" : ".jpg";
+            var nameWithoutExt = Path.GetFileNameWithoutExtension(filename);
+            
+            var thumbnailPath = Path.Combine(rootFolder, ThumbnailsFolder, nameWithoutExt + thumbExt);
+            if (File.Exists(thumbnailPath))
+            {
+                File.Delete(thumbnailPath);
+            }
+
+            var previewPath = Path.Combine(rootFolder, PreviewsFolder, nameWithoutExt + thumbExt);
+            if (File.Exists(previewPath))
+            {
+                File.Delete(previewPath);
+            }
+        }
     }
 }

@@ -33,6 +33,10 @@ namespace KraevedAPI.Service
             var existing = _unitOfWork.PersonsRepository.GetByID(person.Id);
             if (existing == null) return null;
 
+            var existingFilenames = existing.Photos?.Select(p => p.Filename).ToHashSet() ?? [];
+            var newFilenames = person.Photos?.Select(p => p.Filename).ToHashSet() ?? [];
+            var removedFilenames = existingFilenames.Except(newFilenames).ToList();
+
             existing.Surname = person.Surname;
             existing.FirstName = person.FirstName;
             existing.Patronymic = person.Patronymic;
@@ -43,6 +47,12 @@ namespace KraevedAPI.Service
 
             _unitOfWork.PersonsRepository.Update(existing);
             await _unitOfWork.SaveAsync();
+
+            foreach (var filename in removedFilenames)
+            {
+                DeleteImageFiles(filename);
+            }
+
             return existing;
         }
 
@@ -57,8 +67,16 @@ namespace KraevedAPI.Service
                 _unitOfWork.PersonGeoObjectsRepository.Delete(link);
             }
 
+            var photosToDelete = person.Photos?.Select(p => p.Filename).ToList() ?? [];
+
             _unitOfWork.PersonsRepository.Delete(person);
             await _unitOfWork.SaveAsync();
+
+            foreach (var filename in photosToDelete)
+            {
+                DeleteImageFiles(filename);
+            }
+
             return person;
         }
 
