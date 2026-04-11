@@ -12,6 +12,7 @@ namespace KraevedAPI.Service
     {
         private const int ThumbnailMaxSize = 200;
         private const int PreviewMaxSize = 800;
+        private const int OriginalMaxSize = 2000;
         private const string ThumbnailsFolder = "thumbnails";
         private const string PreviewsFolder = "previews";
 
@@ -61,21 +62,26 @@ namespace KraevedAPI.Service
                 var uniqueString = Guid.NewGuid().ToString();
                 var newFileName = uniqueString + ext;
 
-                // Save original
+                // Load, compress and save original
                 var originalPath = Path.Combine(imagesPath, newFileName);
-                await using (var fileStream = new FileStream(originalPath, FileMode.Create))
+                using var originalImage = await Image.LoadAsync(imageFile.OpenReadStream(), token);
+                originalImage.Mutate(x => x.AutoOrient());
+                
+                if (originalImage.Width > OriginalMaxSize || originalImage.Height > OriginalMaxSize)
                 {
-                    await imageFile.CopyToAsync(fileStream, token);
+                    originalImage.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Size = new Size(OriginalMaxSize, OriginalMaxSize),
+                        Mode = ResizeMode.Max,
+                    }));
                 }
+                
+                await SaveImageAsync(originalImage, originalPath, ext, token);
 
-                // Create thumbnail and preview
-                using var image = await Image.LoadAsync(originalPath, token);
-                image.Mutate(x => x.AutoOrient());
-
-                // Thumbnail
+                // Create thumbnail and preview from already loaded image
                 var thumbnailFileName = uniqueString + GetThumbExtension(ext);
                 var thumbnailPath = Path.Combine(thumbnailsPath, thumbnailFileName);
-                using var thumbnail = image.Clone(ctx =>
+                using var thumbnail = originalImage.Clone(ctx =>
                     ctx.Resize(new ResizeOptions
                     {
                         Size = new Size(ThumbnailMaxSize, ThumbnailMaxSize),
@@ -84,10 +90,9 @@ namespace KraevedAPI.Service
                 );
                 await SaveImageAsync(thumbnail, thumbnailPath, ext, token);
 
-                // Preview
                 var previewFileName = uniqueString + GetThumbExtension(ext);
                 var previewPath = Path.Combine(previewsPath, previewFileName);
-                using var preview = image.Clone(ctx =>
+                using var preview = originalImage.Clone(ctx =>
                     ctx.Resize(new ResizeOptions
                     {
                         Size = new Size(PreviewMaxSize, PreviewMaxSize),
