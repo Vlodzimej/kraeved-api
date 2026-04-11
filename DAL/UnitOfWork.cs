@@ -189,6 +189,20 @@ namespace KraevedAPI.DAL
             }
         }
 
+        private GenericRepository<ImageInfo>? imageInfosRepository;
+
+        public GenericRepository<ImageInfo> ImageInfosRepository
+        {
+            get
+            {
+                if (this.imageInfosRepository == null)
+                {
+                    this.imageInfosRepository = new GenericRepository<ImageInfo>(context);
+                }
+                return imageInfosRepository;
+            }
+        }
+
         private RolesRepository? rolesRepository;
         public RolesRepository RolesRepository
         {

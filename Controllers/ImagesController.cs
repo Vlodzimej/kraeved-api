@@ -105,5 +105,16 @@ namespace KraevedAPI.Controllers
 
             return File(fileContents, contentType ?? "application/octet-stream", Path.GetFileName(filepath));
         }
+
+        [HttpDelete("{filename}")]
+        public async Task<ActionResult> DeleteImage(string filename) {
+            try {
+                await _kraevedService.DeleteImage(filename);
+                return Ok();
+            }
+            catch (Exception ex) {
+                return BadRequest(new { ex.Message });
+            }
+        }
     }
 }

@@ -153,5 +153,16 @@ namespace KraevedAPI.Service
                 File.Delete(previewPath);
             }
         }
+
+        public async Task DeleteImage(string filename)
+        {
+            var imageInfo = _unitOfWork.ImageInfosRepository.Get(x => x.Filename == filename).FirstOrDefault();
+            if (imageInfo != null)
+            {
+                _unitOfWork.ImageInfosRepository.Delete(imageInfo.Id);
+                await _unitOfWork.SaveAsync();
+            }
+            DeleteImageFiles(filename);
+        }
     }
 }
