@@ -11,5 +11,6 @@ namespace KraevedAPI.Service
         Task<GeoObject> DeleteGeoObject(int id);
         Task<GeoObject> UpdateGeoObject(GeoObject geoObject);
         Task<ImageInfo> AddImageToGeoObject(int geoObjectId, string filename, string? caption = null);
+        Task UpdateGeoObjectImagesOrder(int geoObjectId, List<int> imageIdsInOrder);
     }
 }

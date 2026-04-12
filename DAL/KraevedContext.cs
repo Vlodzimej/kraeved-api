@@ -78,6 +78,10 @@ namespace KraevedAPI.DAL
                 .HasForeignKey(i => i.PersonId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<ImageInfo>()
+                .Property(i => i.Order)
+                .HasDefaultValue(0);
+
             modelBuilder.Entity<GeoObject>()
                 .HasOne(g => g.Parent)
                 .WithMany(g => g.Children)

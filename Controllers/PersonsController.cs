@@ -146,6 +146,20 @@ namespace KraevedAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
+
+        [HttpPut("{id}/images/order")]
+        public async Task<ActionResult> UpdateImagesOrder(int id, [FromBody] UpdateImagesOrderDto dto)
+        {
+            try
+            {
+                await _kraevedService.UpdatePersonImagesOrder(id, dto.ImageIds);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
     }
 
     public class RelationRequest
