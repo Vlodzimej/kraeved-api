@@ -1,4 +1,5 @@
 using KraevedAPI.DAL;
+using KraevedAPI.Constants;
 using KraevedAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,10 +16,17 @@ namespace KraevedAPI.Service
 
         public async Task<Person?> GetPersonById(int id)
         {
-            return _unitOfWork.PersonsRepository.Get(
+            var person = _unitOfWork.PersonsRepository.Get(
                 filter: p => p.Id == id,
                 includeProperties: "PersonGeoObjects.GeoObject.Type,Photos"
             ).FirstOrDefault();
+
+            if (person?.Photos != null)
+            {
+                person.Photos = person.Photos.OrderBy(p => p.Order).ToList();
+            }
+
+            return person;
         }
 
         public async Task<Person?> InsertPerson(Person person)
@@ -160,7 +168,7 @@ namespace KraevedAPI.Service
                         Patronymic = otherPerson.Patronymic,
                         BirthDate = otherPerson.BirthDate,
                         DeathDate = otherPerson.DeathDate,
-                        Photos = otherPerson.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                        Photos = otherPerson.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption, Order = img.Order }).ToList(),
                         RelationTitle = rel.RelationType?.Title,
                     });
                 }
@@ -252,7 +260,7 @@ namespace KraevedAPI.Service
                 Patronymic = person?.Patronymic,
                 BirthDate = person?.BirthDate,
                 DeathDate = person?.DeathDate,
-                Photos = person?.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                Photos = person?.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption, Order = img.Order }).ToList(),
                 Parents = new List<PersonTreeNode>(),
                 Spouses = new List<PersonRelationDto>(),
                 Children = new List<PersonRelationDto>(),
@@ -274,7 +282,7 @@ namespace KraevedAPI.Service
                     Patronymic = relatedPerson.Patronymic,
                     BirthDate = relatedPerson.BirthDate,
                     DeathDate = relatedPerson.DeathDate,
-                    Photos = relatedPerson.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                    Photos = relatedPerson.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption, Order = img.Order }).ToList(),
                     RelationTitle = rel.RelationType?.Title,
                 };
 
@@ -289,7 +297,7 @@ namespace KraevedAPI.Service
                         Patronymic = relatedPerson.Patronymic,
                         BirthDate = relatedPerson.BirthDate,
                         DeathDate = relatedPerson.DeathDate,
-                        Photos = relatedPerson.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                        Photos = relatedPerson.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption, Order = img.Order }).ToList(),
                     });
                 }
                 else if (relName == "child")
@@ -307,6 +315,44 @@ namespace KraevedAPI.Service
             }
 
             return node;
+        }
+
+        public async Task<ImageInfo> AddImageToPerson(int personId, string filename, string? caption = null)
+        {
+            var person = _unitOfWork.PersonsRepository.GetByID(personId)
+                ?? throw new Exception(ServiceConstants.Exception.NotFound);
+
+            var imageInfo = new ImageInfo
+            {
+                Filename = filename,
+                Caption = caption,
+                PersonId = personId
+            };
+
+            _unitOfWork.ImageInfosRepository.Insert(imageInfo);
+            await _unitOfWork.SaveAsync();
+
+            var saved = _unitOfWork.ImageInfosRepository.Get(x => x.Filename == filename && x.PersonId == personId).FirstOrDefault();
+            return saved ?? imageInfo;
+        }
+
+        public async Task UpdatePersonImagesOrder(int personId, List<int> imageIdsInOrder)
+        {
+            var images = _unitOfWork.ImageInfosRepository.Get(x => x.PersonId == personId).ToList();
+            var orderedImages = imageIdsInOrder
+                .Select((id, index) => new { Id = id, Order = index })
+                .ToDictionary(x => x.Id, x => x.Order);
+
+            foreach (var image in images)
+            {
+                if (orderedImages.TryGetValue(image.Id, out var order))
+                {
+                    image.Order = order;
+                    _unitOfWork.ImageInfosRepository.Update(image);
+                }
+            }
+
+            await _unitOfWork.SaveAsync();
         }
     }
 }

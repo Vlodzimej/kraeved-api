@@ -12,6 +12,7 @@ namespace KraevedAPI.Models
 
         public string Filename { get; set; } = string.Empty;
         public string? Caption { get; set; }
+        public int Order { get; set; }
 
         public int? GeoObjectId { get; set; }
         [JsonIgnore]

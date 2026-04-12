@@ -19,5 +19,7 @@ namespace KraevedAPI.Service
         Task<bool> AddRelation(int personId1, int personId2, int relationTypeId);
         Task<bool> RemoveRelation(int personId1, int personId2, int relationTypeId);
         Task<PersonTreeNode> GetFamilyTree(int personId);
+        Task<ImageInfo> AddImageToPerson(int personId, string filename, string? caption = null);
+        Task UpdatePersonImagesOrder(int personId, List<int> imageIdsInOrder);
     }
 }

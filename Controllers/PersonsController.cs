@@ -132,6 +132,34 @@ namespace KraevedAPI.Controllers
             var result = await _kraevedService.RemoveRelation(request.PersonId1, request.PersonId2, request.RelationTypeId);
             return Ok(result);
         }
+
+        [HttpPost("{id}/images")]
+        public async Task<ActionResult<ImageInfo>> AddImageToPerson(int id, [FromBody] AddImageDto dto)
+        {
+            try
+            {
+                var result = await _kraevedService.AddImageToPerson(id, dto.Filename, dto.Caption);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpPut("{id}/images/order")]
+        public async Task<ActionResult> UpdateImagesOrder(int id, [FromBody] UpdateImagesOrderDto dto)
+        {
+            try
+            {
+                await _kraevedService.UpdatePersonImagesOrder(id, dto.ImageIds);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
     }
 
     public class RelationRequest

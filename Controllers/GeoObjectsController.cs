@@ -310,9 +310,39 @@ namespace KraevedAPI.Controllers
                     Patronymic = p!.Patronymic,
                     BirthDate = p!.BirthDate,
                     DeathDate = p!.DeathDate,
-                    Photos = p!.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption }).ToList(),
+                    Photos = p!.Photos?.Select(img => new ImageInfoDto { Id = img.Id, Filename = img.Filename, Caption = img.Caption, Order = img.Order }).ToList(),
                 });
                 return Ok(dtos);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/images")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult<ImageInfo>> AddImageToGeoObject(int id, [FromBody] AddImageDto dto)
+        {
+            try
+            {
+                var result = await _kraevedService.AddImageToGeoObject(id, dto.Filename, dto.Caption);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpPut("{id}/images/order")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult> UpdateImagesOrder(int id, [FromBody] UpdateImagesOrderDto dto)
+        {
+            try
+            {
+                await _kraevedService.UpdateGeoObjectImagesOrder(id, dto.ImageIds);
+                return Ok();
             }
             catch (Exception ex)
             {

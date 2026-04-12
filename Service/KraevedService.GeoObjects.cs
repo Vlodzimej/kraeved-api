@@ -19,9 +19,16 @@ namespace KraevedAPI.Service
 
             var geoObject = result.FirstOrDefault();
 
-            if (geoObject != null && geoObject.Images == null)
+            if (geoObject != null)
             {
-                geoObject.Images = new List<ImageInfo>();
+                if (geoObject.Images == null)
+                {
+                    geoObject.Images = new List<ImageInfo>();
+                }
+                else
+                {
+                    geoObject.Images = geoObject.Images.OrderBy(i => i.Order).ToList();
+                }
             }
 
             return geoObject;
@@ -274,6 +281,63 @@ namespace KraevedAPI.Service
         {
             var obj = allObjects.FirstOrDefault(x => x.Id == candidateParentId);
             return obj?.Children?.Any(c => c.Id == geoObjectId) == true;
+        }
+
+        public async Task<ImageInfo> AddImageToGeoObject(int geoObjectId, string filename, string? caption = null)
+        {
+            var geoObject = _unitOfWork.GeoObjectsRepository.GetByID(geoObjectId)
+                ?? throw new Exception(ServiceConstants.Exception.NotFound);
+
+            var imageInfo = new ImageInfo
+            {
+                Filename = filename,
+                Caption = caption,
+                GeoObjectId = geoObjectId
+            };
+
+            _unitOfWork.ImageInfosRepository.Insert(imageInfo);
+
+            if (string.IsNullOrEmpty(geoObject.Thumbnail))
+            {
+                geoObject.Thumbnail = filename;
+                _unitOfWork.GeoObjectsRepository.Update(geoObject);
+            }
+
+            await _unitOfWork.SaveAsync();
+
+            var saved = _unitOfWork.ImageInfosRepository.Get(x => x.Filename == filename && x.GeoObjectId == geoObjectId).FirstOrDefault();
+            return saved ?? imageInfo;
+        }
+
+        public async Task UpdateGeoObjectImagesOrder(int geoObjectId, List<int> imageIdsInOrder)
+        {
+            var images = _unitOfWork.ImageInfosRepository.Get(x => x.GeoObjectId == geoObjectId).ToList();
+            var orderedImages = imageIdsInOrder
+                .Select((id, index) => new { Id = id, Order = index })
+                .ToDictionary(x => x.Id, x => x.Order);
+
+            foreach (var image in images)
+            {
+                if (orderedImages.TryGetValue(image.Id, out var order))
+                {
+                    image.Order = order;
+                    _unitOfWork.ImageInfosRepository.Update(image);
+                }
+            }
+
+            var geoObject = _unitOfWork.GeoObjectsRepository.GetByID(geoObjectId);
+            if (geoObject != null && imageIdsInOrder.Count > 0)
+            {
+                var firstImageId = imageIdsInOrder.FirstOrDefault();
+                var firstImage = images.FirstOrDefault(i => i.Id == firstImageId);
+                if (firstImage != null)
+                {
+                    geoObject.Thumbnail = firstImage.Filename;
+                    _unitOfWork.GeoObjectsRepository.Update(geoObject);
+                }
+            }
+
+            await _unitOfWork.SaveAsync();
         }
     }
 }

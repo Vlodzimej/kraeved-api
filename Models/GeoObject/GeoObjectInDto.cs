@@ -56,5 +56,6 @@ namespace KraevedAPI.Models
         public int? Id { get; set; }
         public string Filename { get; set; } = string.Empty;
         public string? Caption { get; set; }
+        public int Order { get; set; }
     }
 }
