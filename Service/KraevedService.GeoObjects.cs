@@ -275,5 +275,31 @@ namespace KraevedAPI.Service
             var obj = allObjects.FirstOrDefault(x => x.Id == candidateParentId);
             return obj?.Children?.Any(c => c.Id == geoObjectId) == true;
         }
+
+        public async Task<ImageInfo> AddImageToGeoObject(int geoObjectId, string filename, string? caption = null)
+        {
+            var geoObject = _unitOfWork.GeoObjectsRepository.GetByID(geoObjectId)
+                ?? throw new Exception(ServiceConstants.Exception.NotFound);
+
+            var imageInfo = new ImageInfo
+            {
+                Filename = filename,
+                Caption = caption,
+                GeoObjectId = geoObjectId
+            };
+
+            _unitOfWork.ImageInfosRepository.Insert(imageInfo);
+
+            if (string.IsNullOrEmpty(geoObject.Thumbnail))
+            {
+                geoObject.Thumbnail = filename;
+                _unitOfWork.GeoObjectsRepository.Update(geoObject);
+            }
+
+            await _unitOfWork.SaveAsync();
+
+            var saved = _unitOfWork.ImageInfosRepository.Get(x => x.Filename == filename && x.GeoObjectId == geoObjectId).FirstOrDefault();
+            return saved ?? imageInfo;
+        }
     }
 }

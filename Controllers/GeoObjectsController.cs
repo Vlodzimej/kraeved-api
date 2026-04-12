@@ -319,5 +319,20 @@ namespace KraevedAPI.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
+
+        [HttpPost("{id}/images")]
+        [Authorize(Roles = "ADMIN")]
+        public async Task<ActionResult<ImageInfo>> AddImageToGeoObject(int id, [FromBody] AddImageDto dto)
+        {
+            try
+            {
+                var result = await _kraevedService.AddImageToGeoObject(id, dto.Filename, dto.Caption);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
     }
 }

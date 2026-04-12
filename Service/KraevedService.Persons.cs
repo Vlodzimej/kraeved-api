@@ -1,4 +1,5 @@
 using KraevedAPI.DAL;
+using KraevedAPI.Constants;
 using KraevedAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -307,6 +308,25 @@ namespace KraevedAPI.Service
             }
 
             return node;
+        }
+
+        public async Task<ImageInfo> AddImageToPerson(int personId, string filename, string? caption = null)
+        {
+            var person = _unitOfWork.PersonsRepository.GetByID(personId)
+                ?? throw new Exception(ServiceConstants.Exception.NotFound);
+
+            var imageInfo = new ImageInfo
+            {
+                Filename = filename,
+                Caption = caption,
+                PersonId = personId
+            };
+
+            _unitOfWork.ImageInfosRepository.Insert(imageInfo);
+            await _unitOfWork.SaveAsync();
+
+            var saved = _unitOfWork.ImageInfosRepository.Get(x => x.Filename == filename && x.PersonId == personId).FirstOrDefault();
+            return saved ?? imageInfo;
         }
     }
 }
